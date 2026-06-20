@@ -4,350 +4,336 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ARIA – Voice AI Assistant</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',sans-serif;background:#0d0d14;color:#e2e2e2;min-height:100vh;display:flex;flex-direction:column}
+    :root{--purple:#7c5df9;--surface:#131320;--surface2:#1a1a2e;--surface3:#1f1f35;--border:rgba(124,93,249,0.12);--border2:rgba(255,255,255,0.06);--text:#e2e2e2;--text2:#888;--text3:#555}
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0a0a0f;
-      color: #e2e2e2;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+    header{display:flex;align-items:center;gap:12px;padding:14px 24px;background:#0d0d14;border-bottom:0.5px solid var(--border2);position:sticky;top:0;z-index:10}
+    .logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c5df9,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px}
+    .logo-text{font-size:17px;font-weight:600;letter-spacing:0.5px;color:#e2e2e2}
+    .logo-sub{font-size:11px;color:var(--text3);margin-top:1px}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+    .lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.25);color:#a78bfa;display:none}
+    .lang-badge.visible{display:block}
+    .icon-btn{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
+    .icon-btn:hover{background:var(--surface3);color:var(--text);border-color:rgba(255,255,255,0.12)}
 
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(10,10,15,0.8);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
+    .main-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px)}
 
-    .logo { font-size: 22px; font-weight: 700; color: #a78bfa; letter-spacing: 2px; }
-    .tagline { font-size: 12px; color: #666; }
+    .sidebar{width:220px;border-right:0.5px solid var(--border2);padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;overflow-y:auto}
+    .sidebar-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:8px 8px 4px}
+    .sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all 0.15s;border:0.5px solid transparent;user-select:none}
+    .sidebar-item:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+    .sidebar-item.active{background:rgba(124,93,249,0.1);color:#a78bfa;border-color:rgba(124,93,249,0.2)}
+    .sidebar-item i{font-size:15px;flex-shrink:0}
+    .sidebar-divider{height:0.5px;background:var(--border2);margin:6px 0}
+    .session-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;margin-left:auto;flex-shrink:0}
+    .voice-label{margin-left:auto;font-size:10px;padding:2px 6px;background:rgba(34,197,94,0.1);color:#22c55e;border-radius:4px}
+    .voice-label.off{background:rgba(136,136,136,0.1);color:var(--text3)}
+    .model-live{margin-left:auto;font-size:10px;padding:2px 6px;background:rgba(34,197,94,0.1);color:#22c55e;border-radius:4px}
 
-    .clear-btn {
-      margin-left: auto;
-      background: transparent;
-      border: 1px solid #333;
-      color: #888;
-      padding: 6px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.2s;
-    }
-    .clear-btn:hover { border-color: #a78bfa; color: #a78bfa; }
+    .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .messages{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;scroll-behavior:smooth}
+    .messages::-webkit-scrollbar{width:4px}
+    .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-    main {
-      width: 100%;
-      max-width: 700px;
-      padding: 100px 20px 200px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;color:var(--text3);padding:40px 20px;text-align:center;min-height:300px}
+    .empty-orb{width:64px;height:64px;border-radius:20px;background:rgba(124,93,249,0.08);border:0.5px solid rgba(124,93,249,0.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:4px}
+    .empty-state h3{font-size:17px;font-weight:600;color:var(--text);margin-bottom:2px}
+    .empty-state p{font-size:13px;line-height:1.6;max-width:280px}
+    .suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+    .chip{font-size:12px;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
+    .chip:hover{border-color:rgba(124,93,249,0.3);color:#a78bfa;background:rgba(124,93,249,0.06)}
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      animation: fadeIn 0.3s ease;
-    }
+    .msg{display:flex;flex-direction:column;gap:4px;animation:fadeUp 0.2s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .msg.user{align-items:flex-end}
+    .msg.aria{align-items:flex-start}
+    .msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px}
+    .msg-meta i{font-size:12px}
+    .bubble{padding:12px 16px;border-radius:16px;max-width:78%;font-size:14px;line-height:1.7;word-break:break-word}
+    .msg.user .bubble{background:linear-gradient(135deg,#6d3ff5,#8b63fa);color:#fff;border-bottom-right-radius:4px}
+    .msg.aria .bubble{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
+    .bubble-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;margin-top:2px}
+    .msg:hover .bubble-actions{opacity:1}
+    .bubble-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s}
+    .bubble-btn:hover{background:var(--surface3);color:var(--text2)}
+    .bubble-btn i{font-size:12px}
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .thinking-bubble{padding:12px 16px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:16px;border-bottom-left-radius:4px;display:flex;align-items:center;gap:10px}
+    .thinking-dots{display:flex;gap:4px}
+    .thinking-dots span{width:6px;height:6px;border-radius:50%;background:#7c5df9;animation:bounce 1.2s infinite}
+    .thinking-dots span:nth-child(2){animation-delay:0.2s}
+    .thinking-dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+    .thinking-label{font-size:12px;color:var(--text3)}
 
-    .message .bubble {
-      padding: 14px 18px;
-      border-radius: 16px;
-      max-width: 85%;
-      line-height: 1.6;
-      font-size: 15px;
-    }
-
-    .message.user { align-items: flex-end; }
-    .message.user .bubble {
-      background: linear-gradient(135deg, #7c3aed, #a78bfa);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-
-    .message.assistant { align-items: flex-start; }
-    .message.assistant .bubble {
-      background: #1a1a2e;
-      border: 1px solid rgba(167,139,250,0.15);
-      color: #e2e2e2;
-      border-bottom-left-radius: 4px;
-    }
-
-    .role-label {
-      font-size: 11px;
-      color: #555;
-      padding: 0 4px;
-    }
-
-    .thinking {
-      display: flex;
-      gap: 5px;
-      padding: 14px 18px;
-      background: #1a1a2e;
-      border-radius: 16px;
-      border-bottom-left-radius: 4px;
-      width: fit-content;
-    }
-    .thinking span {
-      width: 8px; height: 8px;
-      background: #a78bfa;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
-    }
-    .thinking span:nth-child(2) { animation-delay: 0.2s; }
-    .thinking span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%,80%,100% { transform: scale(0.7); opacity:0.5 } 40% { transform: scale(1); opacity:1 } }
-
-    /* Bottom bar */
-    .bottom-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      padding: 24px;
-      background: linear-gradient(transparent, #0a0a0f 40%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .status-text {
-      font-size: 13px;
-      color: #666;
-      min-height: 18px;
-      transition: color 0.3s;
-    }
-    .status-text.active { color: #a78bfa; }
-
-    /* Mic orb */
-    .mic-orb {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #7c3aed, #a78bfa);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, box-shadow 0.3s;
-      box-shadow: 0 0 0 0 rgba(167,139,250,0.4);
-      position: relative;
-    }
-
-    .mic-orb:hover { transform: scale(1.05); }
-    .mic-orb.recording {
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(167,139,250,0.6); }
-      70% { box-shadow: 0 0 0 20px rgba(167,139,250,0); }
-      100% { box-shadow: 0 0 0 0 rgba(167,139,250,0); }
-    }
-
-    .mic-orb svg { width: 28px; height: 28px; fill: white; }
-
-    /* Text input row */
-    .text-row {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 500px;
-    }
-    .text-row input {
-      flex: 1;
-      background: #1a1a2e;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: #e2e2e2;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .text-row input:focus { border-color: #a78bfa; }
-    .text-row input::placeholder { color: #444; }
-    .text-row button {
-      background: #7c3aed;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 20px;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-    .text-row button:hover { background: #6d28d9; }
-
-    .empty-state {
-      text-align: center;
-      color: #333;
-      margin-top: 60px;
-    }
-    .empty-state .big { font-size: 64px; margin-bottom: 16px; }
-    .empty-state p { font-size: 15px; line-height: 1.7; }
+    .bottom{border-top:0.5px solid var(--border2);padding:14px 24px;display:flex;flex-direction:column;gap:10px;background:#0d0d14}
+    .status-row{display:flex;align-items:center;justify-content:center;min-height:18px}
+    .status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+    .status.active{color:#a78bfa}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;display:inline-block}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .input-row{display:flex;align-items:center;gap:10px}
+    .text-input-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:12px;padding:0 12px;transition:border-color 0.15s}
+    .text-input-wrap:focus-within{border-color:rgba(124,93,249,0.4)}
+    .text-input-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;padding:11px 0;font-family:'Segoe UI',sans-serif}
+    .text-input-wrap input::placeholder{color:var(--text3)}
+    .attach-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;transition:color 0.15s;display:flex;align-items:center}
+    .attach-btn:hover{color:var(--text2)}
+    .mic-btn{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6d3ff5,#8b63fa);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
+    .mic-btn:hover{opacity:0.9;transform:scale(1.03)}
+    .mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:micPulse 1.5s infinite}
+    @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}
+    .send-btn{width:42px;height:42px;border-radius:12px;background:var(--surface2);border:0.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:16px;transition:all 0.15s;flex-shrink:0}
+    .send-btn:hover{background:var(--surface3);color:var(--text)}
+    .send-btn.ready{background:linear-gradient(135deg,#6d3ff5,#8b63fa);border-color:transparent;color:#fff}
+    .info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
+    .info-bar span{display:flex;align-items:center;gap:4px}
+    .info-bar i{font-size:12px}
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">ARIA</div>
-  <div class="tagline">AI Real-time Intelligent Assistant</div>
-  <button class="clear-btn" onclick="clearSession()">Clear chat</button>
+  <div class="logo-mark">🎙</div>
+  <div>
+    <div class="logo-text">ARIA</div>
+    <div class="logo-sub">AI Real-time Intelligent Assistant</div>
+  </div>
+  <div class="header-right">
+    <div class="lang-badge" id="langBadge">EN</div>
+    <button class="icon-btn" title="Export chat" onclick="exportChat()"><i class="ti ti-download"></i></button>
+    <button class="icon-btn" title="Clear chat" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+  </div>
 </header>
 
-<main id="chat">
-  <div class="empty-state">
-    <div class="big">🎙️</div>
-    <p>Press the mic button to start talking.<br/>Type a message below if you prefer text.</p>
-  </div>
-</main>
+<div class="main-wrap">
+  <div class="sidebar">
+    <div class="sidebar-label">Session</div>
+    <div class="sidebar-item active">
+      <i class="ti ti-message-circle"></i> Current chat
+      <div class="session-dot"></div>
+    </div>
 
-<div class="bottom-bar">
-  <div class="status-text" id="status">Tap the mic to speak</div>
-  <button class="mic-orb" id="micBtn" onclick="toggleRecording()">
-    <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4zm-1 14.93V19h-2v2h6v-2h-2v-3.07A7.002 7.002 0 0 0 19 11h-2a5 5 0 0 1-10 0H5a7.002 7.002 0 0 0 6 6.93z"/></svg>
-  </button>
-  <div class="text-row">
-    <input type="text" id="textInput" placeholder="Or type your message…" onkeydown="if(event.key==='Enter') sendText()" />
-    <button onclick="sendText()">Send</button>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Quick actions</div>
+    <div class="sidebar-item" onclick="insertChip('Summarize our conversation so far')">
+      <i class="ti ti-sparkles"></i> Summarize chat
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Translate your last reply to Hindi')">
+      <i class="ti ti-language"></i> Translate reply
+    </div>
+    <div class="sidebar-item" onclick="exportChat()">
+      <i class="ti ti-download"></i> Export chat
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Voice</div>
+    <div class="sidebar-item" onclick="toggleVoiceMode()">
+      <i class="ti ti-volume"></i> Auto-speak
+      <span class="voice-label" id="voiceModeLabel">ON</span>
+    </div>
+    <div class="sidebar-item" onclick="insertChip('What languages can you understand and speak?')">
+      <i class="ti ti-world"></i> 99 languages
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Model</div>
+    <div class="sidebar-item" style="cursor:default">
+      <i class="ti ti-bolt"></i> LLaMA 3.3-70B
+      <span class="model-live">Live</span>
+    </div>
+    <div class="sidebar-item" style="cursor:default">
+      <i class="ti ti-ear"></i> Faster-Whisper
+    </div>
+  </div>
+
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-orb">🎙</div>
+        <h3>Start a conversation</h3>
+        <p>Tap the mic to speak, or type a message below. ARIA understands 99 languages automatically.</p>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+          <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+          <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+          <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="status-row">
+        <div class="status" id="status">
+          <i class="ti ti-microphone"></i> Tap mic to speak
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="text-input-wrap">
+          <button class="attach-btn" title="Attach (coming soon)" onclick="alert('File upload coming soon!')">
+            <i class="ti ti-paperclip"></i>
+          </button>
+          <input type="text" id="textInput" placeholder="Message ARIA..."
+            oninput="onInput()"
+            onkeydown="if(event.key==='Enter') sendText()" />
+        </div>
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
+          <i class="ti ti-microphone" id="micIcon"></i>
+        </button>
+        <button class="send-btn" id="sendBtn" onclick="sendText()">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+      <div class="info-bar">
+        <span><i class="ti ti-lock"></i> Private session</span>
+        <span id="msgCount">0 messages</span>
+        <span><i class="ti ti-server"></i> Render · Groq</span>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
   const API = "https://aria-voice-assistant-6eze.onrender.com";
   const sessionId = "session_" + Math.random().toString(36).slice(2, 8);
+  let mediaRecorder = null, audioChunks = [], recording = false;
+  let msgCount = 0, autoSpeak = true;
 
-  let mediaRecorder = null;
-  let audioChunks = [];
-  let recording = false;
-
-  const chat = document.getElementById("chat");
-  const micBtn = document.getElementById("micBtn");
-  const status = document.getElementById("status");
-
-  function setStatus(text, active = false) {
-    status.textContent = text;
-    status.className = "status-text" + (active ? " active" : "");
+  function setStatus(html, active = false) {
+    const s = document.getElementById("status");
+    s.innerHTML = (active ? '<span class="status-dot"></span> ' : '') + html;
+    s.className = "status" + (active ? " active" : "");
   }
 
-  function addMessage(role, text) {
-    // Remove empty state
-    const empty = chat.querySelector(".empty-state");
-    if (empty) empty.remove();
+  function onInput() {
+    const v = document.getElementById("textInput").value.trim();
+    document.getElementById("sendBtn").className = "send-btn" + (v ? " ready" : "");
+  }
 
-    const div = document.createElement("div");
-    div.className = `message ${role}`;
-    div.innerHTML = `
-      <div class="role-label">${role === "user" ? "You" : "ARIA"}</div>
+  function clearEmpty() {
+    document.getElementById("emptyState")?.remove();
+  }
+
+  function addMsg(role, text, lang = null) {
+    clearEmpty();
+    const d = document.createElement("div");
+    d.className = "msg " + role;
+    const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const langTag = lang ? `<span><i class="ti ti-language"></i> ${lang.toUpperCase()}</span>` : "";
+    const actions = role === "aria" ? `
+      <div class="bubble-actions">
+        <button class="bubble-btn" onclick="copyText(this)"><i class="ti ti-copy"></i> Copy</button>
+        <button class="bubble-btn" onclick="speakText(this)"><i class="ti ti-volume"></i> Speak</button>
+      </div>` : "";
+    d.innerHTML = `
+      <div class="msg-meta">
+        ${role === "user" ? "You" : '<i class="ti ti-robot"></i> ARIA'} · ${time} ${langTag}
+      </div>
       <div class="bubble">${text}</div>
+      ${actions}
     `;
-    chat.appendChild(div);
-    div.scrollIntoView({ behavior: "smooth" });
-    return div;
+    document.getElementById("messages").appendChild(d);
+    d.scrollIntoView({ behavior: "smooth" });
+    msgCount++;
+    document.getElementById("msgCount").textContent = msgCount + " message" + (msgCount !== 1 ? "s" : "");
+    return d;
   }
 
   function addThinking() {
-    const empty = chat.querySelector(".empty-state");
-    if (empty) empty.remove();
+    clearEmpty();
+    const d = document.createElement("div");
+    d.className = "msg aria";
+    d.innerHTML = `
+      <div class="msg-meta"><i class="ti ti-robot"></i> ARIA</div>
+      <div class="thinking-bubble">
+        <div class="thinking-dots"><span></span><span></span><span></span></div>
+        <span class="thinking-label">Thinking...</span>
+      </div>`;
+    document.getElementById("messages").appendChild(d);
+    d.scrollIntoView({ behavior: "smooth" });
+    return d;
+  }
 
-    const div = document.createElement("div");
-    div.className = "message assistant";
-    div.innerHTML = `
-      <div class="role-label">ARIA</div>
-      <div class="thinking"><span></span><span></span><span></span></div>
-    `;
-    chat.appendChild(div);
-    div.scrollIntoView({ behavior: "smooth" });
-    return div;
+  function copyText(btn) {
+    const text = btn.closest(".msg").querySelector(".bubble").textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.innerHTML = '<i class="ti ti-check"></i> Copied';
+      setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy"></i> Copy'; }, 1500);
+    });
+  }
+
+  function speakText(btn) {
+    const text = btn.closest(".msg").querySelector(".bubble").textContent.trim();
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(u);
+  }
+
+  function setLang(lang) {
+    const b = document.getElementById("langBadge");
+    if (lang) { b.textContent = lang.toUpperCase(); b.className = "lang-badge visible"; }
+    else { b.className = "lang-badge"; }
   }
 
   async function toggleRecording() {
     if (!recording) {
-      await startRecording();
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          await sendAudio(new Blob(audioChunks, { type: "audio/webm" }));
+        };
+        mediaRecorder.start();
+        recording = true;
+        document.getElementById("micBtn").className = "mic-btn recording";
+        document.getElementById("micIcon").className = "ti ti-player-stop";
+        setStatus("Listening... tap again to stop", true);
+      } catch (e) {
+        setStatus("Microphone access denied");
+      }
     } else {
-      stopRecording();
-    }
-  }
-
-  async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunks = [];
-      mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(audioChunks, { type: "audio/webm" });
-        await sendAudio(blob);
-      };
-
-      mediaRecorder.start();
-      recording = true;
-      micBtn.classList.add("recording");
-      setStatus("Listening… tap again to stop", true);
-    } catch (err) {
-      setStatus("Microphone access denied");
-      console.error(err);
-    }
-  }
-
-  function stopRecording() {
-    if (mediaRecorder && recording) {
       mediaRecorder.stop();
       recording = false;
-      micBtn.classList.remove("recording");
-      setStatus("Processing…", true);
+      document.getElementById("micBtn").className = "mic-btn";
+      document.getElementById("micIcon").className = "ti ti-microphone";
+      setStatus("Processing...", true);
     }
   }
 
   async function sendAudio(blob) {
-    const formData = new FormData();
-    formData.append("audio", blob, "recording.webm");
-
+    const fd = new FormData();
+    fd.append("audio", blob, "recording.webm");
     const thinking = addThinking();
-
     try {
-      const res = await fetch(`${API}/chat/voice?session_id=${sessionId}`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
+      const res = await fetch(`${API}/chat/voice?session_id=${sessionId}`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
       const userText = atob(res.headers.get("X-User-Text") || "") || "…";
       const assistantText = atob(res.headers.get("X-Assistant-Text") || "") || "…";
-
+      const lang = res.headers.get("X-Language");
       thinking.remove();
-      addMessage("user", userText);
-      addMessage("assistant", assistantText);
-
-      // Play audio response
-      const audioBlob = await res.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      setStatus("ARIA is speaking…", true);
-      audio.onended = () => setStatus("Tap the mic to speak");
-      audio.play();
-
-    } catch (err) {
+      addMsg("user", userText, lang);
+      addMsg("aria", assistantText);
+      if (lang) setLang(lang);
+      if (autoSpeak) {
+        const audioBlob = await res.blob();
+        const audio = new Audio(URL.createObjectURL(audioBlob));
+        setStatus('<i class="ti ti-volume"></i> ARIA is speaking...', true);
+        audio.onended = () => setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+        audio.play();
+      } else {
+        setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+      }
+    } catch (e) {
       thinking.remove();
-      addMessage("assistant", "Sorry, something went wrong. Is the backend running?");
-      setStatus("Error — check backend");
-      console.error(err);
+      addMsg("aria", "Connection error — is the backend running?");
+      setStatus("Error connecting to backend");
     }
   }
 
@@ -355,29 +341,72 @@
     const input = document.getElementById("textInput");
     const text = input.value.trim();
     if (!text) return;
-    input.value = "";
-    addMessage("user", text);
+    input.value = ""; onInput();
+    addMsg("user", text);
     const thinking = addThinking();
-
+    setStatus("Processing...", true);
     try {
       const res = await fetch(`${API}/chat/text?session_id=${sessionId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text })
       });
       const data = await res.json();
       thinking.remove();
-      addMessage("assistant", data.assistant);
-    } catch (err) {
+      addMsg("aria", data.assistant);
+      setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+    } catch (e) {
       thinking.remove();
-      addMessage("assistant", "Error connecting to backend.");
+      addMsg("aria", "Connection error.");
+      setStatus("Error");
     }
   }
 
-  async function clearSession() {
-    await fetch(`${API}/session/${sessionId}`, { method: "DELETE" }).catch(() => {});
-    chat.innerHTML = `<div class="empty-state"><div class="big">🎙️</div><p>Press the mic button to start talking.<br/>Type a message below if you prefer text.</p></div>`;
-    setStatus("Chat cleared — tap the mic to speak");
+  function insertChip(text) {
+    document.getElementById("textInput").value = text;
+    onInput();
+    document.getElementById("textInput").focus();
+  }
+
+  function clearChat() {
+    fetch(`${API}/session/${sessionId}`, { method: "DELETE" }).catch(() => {});
+    document.getElementById("messages").innerHTML = `
+      <div class="empty-state" id="emptyState">
+        <div class="empty-orb">🎙</div>
+        <h3>Start a conversation</h3>
+        <p>Tap the mic to speak, or type a message below. ARIA understands 99 languages automatically.</p>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+          <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+          <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+          <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+        </div>
+      </div>`;
+    msgCount = 0;
+    document.getElementById("msgCount").textContent = "0 messages";
+    setLang(null);
+    setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+  }
+
+  function toggleVoiceMode() {
+    autoSpeak = !autoSpeak;
+    const lbl = document.getElementById("voiceModeLabel");
+    lbl.textContent = autoSpeak ? "ON" : "OFF";
+    lbl.className = "voice-label" + (autoSpeak ? "" : " off");
+  }
+
+  function exportChat() {
+    const msgs = [...document.querySelectorAll(".msg")];
+    if (!msgs.length) { alert("No messages to export yet."); return; }
+    const lines = msgs.map(m => {
+      const role = m.classList.contains("user") ? "You" : "ARIA";
+      const text = m.querySelector(".bubble")?.textContent?.trim() || "";
+      const time = m.querySelector(".msg-meta")?.textContent?.trim() || "";
+      return `[${time}]\n${role}: ${text}`;
+    });
+    const blob = new Blob(["ARIA Chat Export\n" + new Date().toLocaleString() + "\n\n" + lines.join("\n\n")], { type: "text/plain" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "aria-chat-" + Date.now() + ".txt"; a.click();
   }
 </script>
 </body>
