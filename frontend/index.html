@@ -15,7 +15,7 @@
     .logo-text{font-size:17px;font-weight:600;letter-spacing:0.5px;color:#e2e2e2}
     .logo-sub{font-size:11px;color:var(--text3);margin-top:1px}
     .header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-    .lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.25);color:#a78bfa;display:none}
+    .lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.25);color:#a78bfa;display:none;transition:all 0.3s}
     .lang-badge.visible{display:block}
     .icon-btn{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
     .icon-btn:hover{background:var(--surface3);color:var(--text);border-color:rgba(255,255,255,0.12)}
@@ -47,12 +47,13 @@
     .chip{font-size:12px;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
     .chip:hover{border-color:rgba(124,93,249,0.3);color:#a78bfa;background:rgba(124,93,249,0.06)}
 
-    .msg{display:flex;flex-direction:column;gap:4px;animation:fadeUp 0.2s ease}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .msg{display:flex;flex-direction:column;gap:4px;animation:fadeUp 0.25s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .msg.user{align-items:flex-end}
     .msg.aria{align-items:flex-start}
-    .msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px}
+    .msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .msg-meta i{font-size:12px}
+    .lang-tag{font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.2);color:#a78bfa}
     .bubble{padding:12px 16px;border-radius:16px;max-width:78%;font-size:14px;line-height:1.7;word-break:break-word}
     .msg.user .bubble{background:linear-gradient(135deg,#6d3ff5,#8b63fa);color:#fff;border-bottom-right-radius:4px}
     .msg.aria .bubble{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
@@ -62,20 +63,34 @@
     .bubble-btn:hover{background:var(--surface3);color:var(--text2)}
     .bubble-btn i{font-size:12px}
 
+    /* Typing indicator */
     .thinking-bubble{padding:12px 16px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:16px;border-bottom-left-radius:4px;display:flex;align-items:center;gap:10px}
     .thinking-dots{display:flex;gap:4px}
     .thinking-dots span{width:6px;height:6px;border-radius:50%;background:#7c5df9;animation:bounce 1.2s infinite}
     .thinking-dots span:nth-child(2){animation-delay:0.2s}
     .thinking-dots span:nth-child(3){animation-delay:0.4s}
     @keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-    .thinking-label{font-size:12px;color:var(--text3)}
+    .thinking-label{font-size:12px;color:var(--text3);animation:fadeText 2s infinite}
+    @keyframes fadeText{0%,100%{opacity:0.4}50%{opacity:1}}
+
+    /* Waveform */
+    .waveform{display:none;align-items:center;gap:3px;height:20px;margin-right:8px}
+    .waveform.active{display:flex}
+    .waveform span{width:3px;border-radius:3px;background:#a78bfa;animation:wave 1s infinite ease-in-out}
+    .waveform span:nth-child(1){animation-delay:0.0s;height:6px}
+    .waveform span:nth-child(2){animation-delay:0.1s;height:14px}
+    .waveform span:nth-child(3){animation-delay:0.2s;height:20px}
+    .waveform span:nth-child(4){animation-delay:0.3s;height:14px}
+    .waveform span:nth-child(5){animation-delay:0.4s;height:6px}
+    @keyframes wave{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
 
     .bottom{border-top:0.5px solid var(--border2);padding:14px 24px;display:flex;flex-direction:column;gap:10px;background:#0d0d14}
-    .status-row{display:flex;align-items:center;justify-content:center;min-height:18px}
+    .status-row{display:flex;align-items:center;justify-content:center;min-height:20px;gap:0}
     .status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
     .status.active{color:#a78bfa}
-    .status-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;display:inline-block}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;display:inline-block;flex-shrink:0}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
     .input-row{display:flex;align-items:center;gap:10px}
     .text-input-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:12px;padding:0 12px;transition:border-color 0.15s}
     .text-input-wrap:focus-within{border-color:rgba(124,93,249,0.4)}
@@ -86,13 +101,17 @@
     .mic-btn{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6d3ff5,#8b63fa);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
     .mic-btn:hover{opacity:0.9;transform:scale(1.03)}
     .mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:micPulse 1.5s infinite}
-    @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}
+    @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 10px rgba(231,76,60,0)}}
     .send-btn{width:42px;height:42px;border-radius:12px;background:var(--surface2);border:0.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:16px;transition:all 0.15s;flex-shrink:0}
     .send-btn:hover{background:var(--surface3);color:var(--text)}
     .send-btn.ready{background:linear-gradient(135deg,#6d3ff5,#8b63fa);border-color:transparent;color:#fff}
+
     .info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
     .info-bar span{display:flex;align-items:center;gap:4px}
     .info-bar i{font-size:12px}
+    .char-warn{color:#f59e0b !important}
+
+    .kbd{font-size:10px;padding:2px 5px;border-radius:4px;border:0.5px solid var(--border2);color:var(--text3);background:var(--surface3)}
   </style>
 </head>
 <body>
@@ -156,7 +175,7 @@
       <div class="empty-state" id="emptyState">
         <div class="empty-orb">🎙</div>
         <h3>Start a conversation</h3>
-        <p>Tap the mic to speak, or type a message below. ARIA understands 99 languages automatically.</p>
+        <p>Tap the mic to speak, or type a message. ARIA understands 99 languages automatically.</p>
         <div class="suggestion-chips">
           <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
           <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
@@ -168,8 +187,11 @@
 
     <div class="bottom">
       <div class="status-row">
+        <div class="waveform" id="waveform">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
         <div class="status" id="status">
-          <i class="ti ti-microphone"></i> Tap mic to speak
+          <i class="ti ti-microphone"></i> Tap mic to speak &nbsp;<span class="kbd">Space</span>
         </div>
       </div>
       <div class="input-row">
@@ -177,19 +199,22 @@
           <button class="attach-btn" title="Attach (coming soon)" onclick="alert('File upload coming soon!')">
             <i class="ti ti-paperclip"></i>
           </button>
-          <input type="text" id="textInput" placeholder="Message ARIA..."
+          <input type="text" id="textInput"
+            placeholder="Message ARIA... (Enter to send)"
+            maxlength="500"
             oninput="onInput()"
-            onkeydown="if(event.key==='Enter') sendText()" />
+            onkeydown="handleKey(event)" />
         </div>
-        <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Record voice (Space)">
           <i class="ti ti-microphone" id="micIcon"></i>
         </button>
-        <button class="send-btn" id="sendBtn" onclick="sendText()">
+        <button class="send-btn" id="sendBtn" onclick="sendText()" title="Send (Enter)">
           <i class="ti ti-send"></i>
         </button>
       </div>
       <div class="info-bar">
         <span><i class="ti ti-lock"></i> Private session</span>
+        <span id="charCount"></span>
         <span id="msgCount">0 messages</span>
         <span><i class="ti ti-server"></i> Render · Groq</span>
       </div>
@@ -203,6 +228,18 @@
   let mediaRecorder = null, audioChunks = [], recording = false;
   let msgCount = 0, autoSpeak = true;
 
+  // Keyboard shortcut: Space = toggle mic (when input not focused)
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space" && document.activeElement !== document.getElementById("textInput")) {
+      e.preventDefault();
+      toggleRecording();
+    }
+  });
+
+  function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) sendText();
+  }
+
   function setStatus(html, active = false) {
     const s = document.getElementById("status");
     s.innerHTML = (active ? '<span class="status-dot"></span> ' : '') + html;
@@ -210,8 +247,19 @@
   }
 
   function onInput() {
-    const v = document.getElementById("textInput").value.trim();
-    document.getElementById("sendBtn").className = "send-btn" + (v ? " ready" : "");
+    const input = document.getElementById("textInput");
+    const v = input.value;
+    const len = v.length;
+    document.getElementById("sendBtn").className = "send-btn" + (v.trim() ? " ready" : "");
+
+    // Character counter
+    const cc = document.getElementById("charCount");
+    if (len > 0) {
+      cc.textContent = len + "/500";
+      cc.className = len > 400 ? "char-warn" : "";
+    } else {
+      cc.textContent = "";
+    }
   }
 
   function clearEmpty() {
@@ -223,7 +271,7 @@
     const d = document.createElement("div");
     d.className = "msg " + role;
     const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const langTag = lang ? `<span><i class="ti ti-language"></i> ${lang.toUpperCase()}</span>` : "";
+    const langTag = lang ? `<span class="lang-tag"><i class="ti ti-language"></i> ${lang.toUpperCase()}</span>` : "";
     const actions = role === "aria" ? `
       <div class="bubble-actions">
         <button class="bubble-btn" onclick="copyText(this)"><i class="ti ti-copy"></i> Copy</button>
@@ -251,7 +299,7 @@
       <div class="msg-meta"><i class="ti ti-robot"></i> ARIA</div>
       <div class="thinking-bubble">
         <div class="thinking-dots"><span></span><span></span><span></span></div>
-        <span class="thinking-label">Thinking...</span>
+        <span class="thinking-label">ARIA is thinking...</span>
       </div>`;
     document.getElementById("messages").appendChild(d);
     d.scrollIntoView({ behavior: "smooth" });
@@ -279,6 +327,10 @@
     else { b.className = "lang-badge"; }
   }
 
+  function setWaveform(active) {
+    document.getElementById("waveform").className = "waveform" + (active ? " active" : "");
+  }
+
   async function toggleRecording() {
     if (!recording) {
       try {
@@ -288,13 +340,15 @@
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = async () => {
           stream.getTracks().forEach(t => t.stop());
+          setWaveform(false);
           await sendAudio(new Blob(audioChunks, { type: "audio/webm" }));
         };
         mediaRecorder.start();
         recording = true;
         document.getElementById("micBtn").className = "mic-btn recording";
         document.getElementById("micIcon").className = "ti ti-player-stop";
-        setStatus("Listening... tap again to stop", true);
+        setWaveform(true);
+        setStatus("Listening... tap again to stop &nbsp;<span class='kbd'>Space</span>", true);
       } catch (e) {
         setStatus("Microphone access denied");
       }
@@ -325,10 +379,10 @@
         const audioBlob = await res.blob();
         const audio = new Audio(URL.createObjectURL(audioBlob));
         setStatus('<i class="ti ti-volume"></i> ARIA is speaking...', true);
-        audio.onended = () => setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+        audio.onended = () => setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
         audio.play();
       } else {
-        setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+        setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
       }
     } catch (e) {
       thinking.remove();
@@ -354,7 +408,7 @@
       const data = await res.json();
       thinking.remove();
       addMsg("aria", data.assistant);
-      setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+      setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
     } catch (e) {
       thinking.remove();
       addMsg("aria", "Connection error.");
@@ -368,24 +422,28 @@
     document.getElementById("textInput").focus();
   }
 
+  const emptyHTML = `
+    <div class="empty-state" id="emptyState">
+      <div class="empty-orb">🎙</div>
+      <h3>Start a conversation</h3>
+      <p>Tap the mic to speak, or type a message. ARIA understands 99 languages automatically.</p>
+      <div class="suggestion-chips">
+        <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+        <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+        <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+        <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+      </div>
+    </div>`;
+
   function clearChat() {
     fetch(`${API}/session/${sessionId}`, { method: "DELETE" }).catch(() => {});
-    document.getElementById("messages").innerHTML = `
-      <div class="empty-state" id="emptyState">
-        <div class="empty-orb">🎙</div>
-        <h3>Start a conversation</h3>
-        <p>Tap the mic to speak, or type a message below. ARIA understands 99 languages automatically.</p>
-        <div class="suggestion-chips">
-          <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
-          <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
-          <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
-          <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
-        </div>
-      </div>`;
+    document.getElementById("messages").innerHTML = emptyHTML;
     msgCount = 0;
     document.getElementById("msgCount").textContent = "0 messages";
+    document.getElementById("charCount").textContent = "";
     setLang(null);
-    setStatus('<i class="ti ti-microphone"></i> Tap mic to speak');
+    setWaveform(false);
+    setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
   }
 
   function toggleVoiceMode() {
@@ -401,12 +459,17 @@
     const lines = msgs.map(m => {
       const role = m.classList.contains("user") ? "You" : "ARIA";
       const text = m.querySelector(".bubble")?.textContent?.trim() || "";
-      const time = m.querySelector(".msg-meta")?.textContent?.trim() || "";
-      return `[${time}]\n${role}: ${text}`;
+      const meta = m.querySelector(".msg-meta")?.textContent?.trim() || "";
+      return `[${meta}]\n${role}: ${text}`;
     });
-    const blob = new Blob(["ARIA Chat Export\n" + new Date().toLocaleString() + "\n\n" + lines.join("\n\n")], { type: "text/plain" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = "aria-chat-" + Date.now() + ".txt"; a.click();
+    const blob = new Blob(
+      ["ARIA Chat Export\n" + new Date().toLocaleString() + "\nSession: " + sessionId + "\n\n" + lines.join("\n\n")],
+      { type: "text/plain" }
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "aria-chat-" + Date.now() + ".txt";
+    a.click();
   }
 </script>
 </body>
