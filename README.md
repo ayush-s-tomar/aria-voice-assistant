@@ -1,147 +1,43 @@
 # 🎙️ ARIA – Voice AI Assistant
 
-**Speech-to-Speech AI assistant** built with Whisper + Groq LLaMA + gTTS  
-Pipeline: `Your voice → Whisper STT → LLM (Groq) → gTTS TTS → Voice response`
+**Speech-to-Speech AI assistant** built with Faster-Whisper + Groq LLaMA + gTTS  
+Pipeline: `Your voice → Faster-Whisper STT → LLM (Groq) → gTTS TTS → Voice response`
+
+🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)  
+⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)  
+📖 **API Docs:** [aria-voice-assistant-6eze.onrender.com/docs](https://aria-voice-assistant-6eze.onrender.com/docs)
+
+---
+
+## ✨ Features
+
+- 🎤 **Voice input** — record directly from your browser mic
+- 🌍 **99-language support** — speak in Hindi, Spanish, French, English, and more — auto-detected
+- 🧠 **Conversation memory** — ARIA remembers context across turns in a session
+- 🔊 **Voice output** — responses spoken aloud via gTTS (or ElevenLabs for premium voice)
+- ⚡ **Fast inference** — Groq LLaMA-3.3-70B for near-instant responses
+- 💬 **Text fallback** — type messages if mic isn't available
 
 ---
 
 ## 🗂️ Project Structure
 
 ```
-voice-ai-assistant/
+aria-voice-assistant/
 ├── backend/
 │   ├── main.py                  # FastAPI app (3 endpoints)
 │   ├── requirements.txt
 │   ├── .env.example
 │   └── services/
-│       ├── transcriber.py       # Whisper STT
-│       ├── llm.py               # Groq LLaMA with memory
-│       └── tts.py               # gTTS / ElevenLabs TTS
+│       ├── transcriber.py       # Faster-Whisper STT (99 languages)
+│       ├── llm.py               # Groq LLaMA with rolling memory
+│       └── tts.py               # gTTS (free) / ElevenLabs (premium)
 ├── frontend/
-│   └── index.html               # Single-file voice UI
-├── render.yaml                  # Deploy to Render
+│   └── index.html               # Single-file voice UI (no framework)
+├── docs/                        # GitHub Pages deployment
+├── render.yaml                  # One-click Render deploy config
 └── README.md
 ```
-
----
-
-## ⚙️ Step-by-Step Setup (Local)
-
-### Step 1 — Prerequisites
-- Python 3.11 (same as your other projects)
-- A Groq API key → https://console.groq.com
-- ffmpeg installed (needed by Whisper)
-
-**Install ffmpeg on Windows (PowerShell):**
-```powershell
-winget install ffmpeg
-# OR download from https://ffmpeg.org/download.html and add to PATH
-```
-
----
-
-### Step 2 — Clone & Setup Backend
-
-```powershell
-cd voice-ai-assistant/backend
-
-# Create virtual env with Python 3.11
-py -3.11 -m venv venv
-venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-> **Note:** First run will download the Whisper `base` model (~140 MB). This is automatic.
-
----
-
-### Step 3 — Configure Environment
-
-```powershell
-copy .env.example .env
-```
-
-Edit `.env`:
-```
-GROQ_API_KEY=your_groq_api_key_here
-WHISPER_MODEL=base
-# Leave ELEVENLABS_API_KEY blank to use free gTTS
-```
-
----
-
-### Step 4 — Run the Backend
-
-```powershell
-# Make sure venv is active
-uvicorn main:app --reload --port 8000
-```
-
-Open → http://localhost:8000  
-Docs → http://localhost:8000/docs
-
----
-
-### Step 5 — Open the Frontend
-
-Just open `frontend/index.html` in your browser (double-click or drag into Chrome).
-
-> No server needed for the frontend — it's a single HTML file.
-
----
-
-### Step 6 — Test It
-
-1. Click the **purple mic button**
-2. Speak your message
-3. Click again to stop recording
-4. Wait 2–3 seconds for ARIA to respond with voice
-5. Or type in the text box and press Enter
-
----
-
-## 🚀 Deploy to Render (Free)
-
-1. Push this repo to GitHub
-2. Go to https://render.com → New → Web Service
-3. Connect your repo
-4. Render detects `render.yaml` automatically
-5. Add env var: `GROQ_API_KEY` in Render dashboard
-6. Deploy → get your public URL
-7. Update `API` in `frontend/index.html` line 1:
-   ```js
-   const API = "https://your-app.onrender.com";
-   ```
-8. Host the frontend on GitHub Pages (just push `frontend/` to a gh-pages branch)
-
----
-
-## 🔧 Upgrade: ElevenLabs Premium Voice
-
-1. Get API key at https://elevenlabs.io
-2. Add to `.env`:
-   ```
-   ELEVENLABS_API_KEY=your_key_here
-   ```
-3. Restart backend — it auto-detects and switches to ElevenLabs
-
----
-
-## 🌐 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/chat/voice` | Full pipeline: audio → text → LLM → audio |
-| POST | `/chat/text` | Text-only: message → LLM response |
-| DELETE | `/session/{id}` | Clear conversation memory |
-
----
-
-## 🧠 How Memory Works
-
-Each browser tab generates a unique `session_id`. The backend keeps a rolling 20-message history per session. Memory is cleared on page refresh or via the "Clear chat" button.
 
 ---
 
@@ -149,17 +45,106 @@ Each browser tab generates a unique `session_id`. The backend keeps a rolling 20
 
 | Layer | Tech |
 |-------|------|
-| STT | OpenAI Whisper (local, free) |
+| STT | Faster-Whisper (local, free, 99 languages) |
 | LLM | Groq + LLaMA-3.3-70B |
 | TTS | gTTS (free) / ElevenLabs (premium) |
 | API | FastAPI + Uvicorn |
 | Frontend | Vanilla HTML/CSS/JS |
-| Deploy | Render |
+| Deploy | Render (backend) + GitHub Pages (frontend) |
 
 ---
 
-## 💡 LinkedIn Post Angle
+## ⚙️ Local Setup
 
-> "Built ARIA — a voice AI assistant that listens, thinks, and talks back.  
-> Full speech-to-speech pipeline: Whisper → LLaMA via Groq → gTTS  
-> Under 200 lines of Python. Deployed on Render. 🎙️"
+### Prerequisites
+- Python 3.11
+- Groq API key → [console.groq.com](https://console.groq.com)
+- ffmpeg installed
+
+```powershell
+# Install ffmpeg (Windows)
+winget install ffmpeg
+```
+
+### Step 1 — Clone & Setup
+
+```powershell
+git clone https://github.com/ayush-s-tomar/aria-voice-assistant.git
+cd aria-voice-assistant/backend
+
+py -3.11 -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Step 2 — Configure Environment
+
+```powershell
+copy .env.example .env
+```
+
+Edit `.env`:
+```env
+GROQ_API_KEY=your_groq_api_key_here
+WHISPER_MODEL=base        # tiny | base | small | medium
+ELEVENLABS_API_KEY=       # optional — leave blank to use free gTTS
+```
+
+### Step 3 — Run
+
+```powershell
+uvicorn main:app --reload --port 8000
+```
+
+Then open `frontend/index.html` in Chrome (double-click or drag into browser).
+
+---
+
+## 🌐 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/chat/voice` | Full pipeline: audio → STT → LLM → TTS → audio |
+| POST | `/chat/text` | Text-only: message → LLM response |
+| DELETE | `/session/{id}` | Clear conversation memory |
+
+---
+
+## 🚀 Deploy Your Own
+
+### Backend → Render
+1. Fork this repo
+2. Go to [render.com](https://render.com) → New → Web Service
+3. Connect your fork — `render.yaml` is auto-detected
+4. Add env var: `GROQ_API_KEY` in Render dashboard
+5. Set `WHISPER_MODEL=tiny` (recommended for free tier)
+6. Deploy
+
+### Frontend → GitHub Pages
+1. Update `const API` in `frontend/index.html` with your Render URL
+2. Copy to `docs/index.html` and push
+3. Enable GitHub Pages → branch: `main` → folder: `/docs`
+
+---
+
+## 🧠 How Memory Works
+
+Each browser tab generates a unique `session_id`. The backend maintains a rolling 20-message history per session in memory. Cleared on page refresh or via the "Clear chat" button.
+
+---
+
+## 🔧 Upgrade to Premium Voice (ElevenLabs)
+
+1. Get API key at [elevenlabs.io](https://elevenlabs.io)
+2. Add to `.env`:
+   ```
+   ELEVENLABS_API_KEY=your_key_here
+   ```
+3. Restart backend — switches automatically, no code changes needed
+
+---
+
+## 🛠️ Built By
+
+**Ayush Singh Tomar** — AI Developer  
+[LinkedIn](https://linkedin.com/in/ayushsinghtomar) • [GitHub](https://github.com/ayush-s-tomar) • [Portfolio Projects](https://agentloop.onrender.com)
