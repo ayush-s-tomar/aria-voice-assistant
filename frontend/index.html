@@ -1,123 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ARIA – Voice AI Assistant</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',sans-serif;background:#0d0d14;color:#e2e2e2;min-height:100vh;display:flex;flex-direction:column}
-    :root{--purple:#7c5df9;--surface:#131320;--surface2:#1a1a2e;--surface3:#1f1f35;--border:rgba(124,93,249,0.12);--border2:rgba(255,255,255,0.06);--text:#e2e2e2;--text2:#888;--text3:#555}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — AI Real-time Intelligent Assistant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#07070D;
+  --s0:#0E0E1A;
+  --s1:#141422;
+  --s2:#1C1C2E;
+  --s3:#242438;
+  --border:rgba(120,100,255,0.12);
+  --border-lit:rgba(120,100,255,0.28);
+  --violet:#7C5CFC;
+  --violet-dim:rgba(124,92,252,0.15);
+  --violet-glow:rgba(124,92,252,0.08);
+  --lilac:#C084FC;
+  --text:#EEEAF8;
+  --text2:#9B93B8;
+  --text3:#5C5478;
+  --green:#34D399;
+  --green-dim:rgba(52,211,153,0.12);
+  --red:#F87171;
+  --font-d:'Space Grotesk',system-ui,sans-serif;
+  --font-b:'Inter',system-ui,sans-serif;
+  --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
+}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;min-height:100vh}
 
-    header{display:flex;align-items:center;gap:12px;padding:14px 24px;background:#0d0d14;border-bottom:0.5px solid var(--border2);position:sticky;top:0;z-index:10}
-    .logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c5df9,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px}
-    .logo-text{font-size:17px;font-weight:600;letter-spacing:0.5px;color:#e2e2e2}
-    .logo-sub{font-size:11px;color:var(--text3);margin-top:1px}
-    .header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-    .lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.25);color:#a78bfa;display:none;transition:all 0.3s}
-    .lang-badge.visible{display:block}
-    .icon-btn{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
-    .icon-btn:hover{background:var(--surface3);color:var(--text);border-color:rgba(255,255,255,0.12)}
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:12px;padding:13px 22px;background:var(--s0);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;flex-shrink:0}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon i{font-size:17px;color:#fff}
+.logo-text{font-family:var(--font-d);font-size:16px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.05em;text-transform:uppercase}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac);display:none;font-weight:500;letter-spacing:0.04em}
+.lang-badge.visible{display:block}
+.icon-btn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
+.icon-btn:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border-lit)}
 
-    .main-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px)}
+/* ── LAYOUT ── */
+.main-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px)}
 
-    .sidebar{width:220px;border-right:0.5px solid var(--border2);padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;overflow-y:auto}
-    .sidebar-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:8px 8px 4px}
-    .sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all 0.15s;border:0.5px solid transparent;user-select:none}
-    .sidebar-item:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
-    .sidebar-item.active{background:rgba(124,93,249,0.1);color:#a78bfa;border-color:rgba(124,93,249,0.2)}
-    .sidebar-item i{font-size:15px;flex-shrink:0}
-    .sidebar-divider{height:0.5px;background:var(--border2);margin:6px 0}
-    .session-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;margin-left:auto;flex-shrink:0}
-    .voice-label{margin-left:auto;font-size:10px;padding:2px 6px;background:rgba(34,197,94,0.1);color:#22c55e;border-radius:4px}
-    .voice-label.off{background:rgba(136,136,136,0.1);color:var(--text3)}
-    .model-live{margin-left:auto;font-size:10px;padding:2px 6px;background:rgba(34,197,94,0.1);color:#22c55e;border-radius:4px}
+/* ── SIDEBAR ── */
+.sidebar{width:220px;border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;background:var(--s0)}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
+.sidebar-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:10px 8px 4px;font-weight:500}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:12.5px;color:var(--text2);transition:all 0.15s;border:1px solid transparent;user-select:none}
+.sidebar-item:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border)}
+.sidebar-item.active{background:var(--violet-dim);color:#B8A8FF;border-color:var(--border-lit)}
+.sidebar-item i{font-size:14px;flex-shrink:0;opacity:0.8}
+.sidebar-item.active i{opacity:1}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 2px}
+.session-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);margin-left:auto;flex-shrink:0;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:0.4}}
+.voice-label{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.2)}
+.voice-label.off{background:rgba(90,90,120,0.15);color:var(--text3);border-color:var(--border)}
+.model-live{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--violet-dim);color:var(--lilac);border:1px solid var(--border-lit)}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.model-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 13px;margin:0 2px}
+.model-card-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:7px}
+.model-row-inner{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2);padding:3px 0}
+.model-dot{width:5px;height:5px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-right:7px}
+.model-dot.dim{background:var(--text3)}
+.model-name-inner{display:flex;align-items:center}
 
-    .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-    .messages{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;scroll-behavior:smooth}
-    .messages::-webkit-scrollbar{width:4px}
-    .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* ── CHAT AREA ── */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--s0)}
 
-    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;color:var(--text3);padding:40px 20px;text-align:center;min-height:300px}
-    .empty-orb{width:64px;height:64px;border-radius:20px;background:rgba(124,93,249,0.08);border:0.5px solid rgba(124,93,249,0.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:4px}
-    .empty-state h3{font-size:17px;font-weight:600;color:var(--text);margin-bottom:2px}
-    .empty-state p{font-size:13px;line-height:1.6;max-width:280px}
-    .suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
-    .chip{font-size:12px;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
-    .chip:hover{border-color:rgba(124,93,249,0.3);color:#a78bfa;background:rgba(124,93,249,0.06)}
+/* topbar */
+.topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.session-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--text2)}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{display:flex;align-items:center;gap:5px;padding:0 10px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;font-size:11.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;font-family:var(--font-b)}
+.lang-btn:hover{background:var(--violet-glow);border-color:var(--border-lit);color:var(--text)}
+.lang-btn i{font-size:13px}
 
-    .msg{display:flex;flex-direction:column;gap:4px;animation:fadeUp 0.25s ease}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .msg.user{align-items:flex-end}
-    .msg.aria{align-items:flex-start}
-    .msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .msg-meta i{font-size:12px}
-    .lang-tag{font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(124,93,249,0.1);border:0.5px solid rgba(124,93,249,0.2);color:#a78bfa}
-    .bubble{padding:12px 16px;border-radius:16px;max-width:78%;font-size:14px;line-height:1.7;word-break:break-word}
-    .msg.user .bubble{background:linear-gradient(135deg,#6d3ff5,#8b63fa);color:#fff;border-bottom-right-radius:4px}
-    .msg.aria .bubble{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
-    .bubble-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;margin-top:2px}
-    .msg:hover .bubble-actions{opacity:1}
-    .bubble-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s}
-    .bubble-btn:hover{background:var(--surface3);color:var(--text2)}
-    .bubble-btn i{font-size:12px}
+/* messages */
+.messages{flex:1;overflow-y:auto;padding:28px 28px 16px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
 
-    /* Typing indicator */
-    .thinking-bubble{padding:12px 16px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:16px;border-bottom-left-radius:4px;display:flex;align-items:center;gap:10px}
-    .thinking-dots{display:flex;gap:4px}
-    .thinking-dots span{width:6px;height:6px;border-radius:50%;background:#7c5df9;animation:bounce 1.2s infinite}
-    .thinking-dots span:nth-child(2){animation-delay:0.2s}
-    .thinking-dots span:nth-child(3){animation-delay:0.4s}
-    @keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-    .thinking-label{font-size:12px;color:var(--text3);animation:fadeText 2s infinite}
-    @keyframes fadeText{0%,100%{opacity:0.4}50%{opacity:1}}
+/* empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;color:var(--text3);padding:40px 20px;text-align:center;min-height:300px}
+.empty-orb{width:68px;height:68px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:4px}
+.empty-orb i{font-size:28px;color:var(--violet)}
+.empty-state h3{font-family:var(--font-d);font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty-state p{font-size:13px;line-height:1.65;max-width:290px;color:var(--text2)}
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
+.chip:hover{border-color:var(--border-lit);color:#B8A8FF;background:var(--violet-dim)}
 
-    /* Waveform */
-    .waveform{display:none;align-items:center;gap:3px;height:20px;margin-right:8px}
-    .waveform.active{display:flex}
-    .waveform span{width:3px;border-radius:3px;background:#a78bfa;animation:wave 1s infinite ease-in-out}
-    .waveform span:nth-child(1){animation-delay:0.0s;height:6px}
-    .waveform span:nth-child(2){animation-delay:0.1s;height:14px}
-    .waveform span:nth-child(3){animation-delay:0.2s;height:20px}
-    .waveform span:nth-child(4){animation-delay:0.3s;height:14px}
-    .waveform span:nth-child(5){animation-delay:0.4s;height:6px}
-    @keyframes wave{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+/* date divider */
+.date-div{display:flex;align-items:center;gap:12px;margin:18px 0 20px}
+.date-div::before,.date-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.date-div span{font-size:10.5px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase}
 
-    .bottom{border-top:0.5px solid var(--border2);padding:14px 24px;display:flex;flex-direction:column;gap:10px;background:#0d0d14}
-    .status-row{display:flex;align-items:center;justify-content:center;min-height:20px;gap:0}
-    .status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
-    .status.active{color:#a78bfa}
-    .status-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;display:inline-block;flex-shrink:0}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* messages */
+.msg{display:flex;flex-direction:column;gap:3px;animation:fadeUp 0.22s ease;margin-bottom:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-items:flex-end}
+.msg.aria{align-items:flex-start}
+.msg-row{display:flex;align-items:flex-end;gap:9px}
+.msg.user .msg-row{flex-direction:row-reverse}
+.msg-avatar{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;font-family:var(--font-d)}
+.msg-avatar.av-aria{background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);color:#fff}
+.msg-avatar.av-user{background:var(--s3);border:1px solid var(--border);color:var(--text2)}
+.msg-content{display:flex;flex-direction:column;gap:3px;max-width:calc(100% - 80px)}
+.msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0 4px}
+.msg.user .msg-meta{justify-content:flex-end}
+.msg-name{color:var(--text2);font-weight:500}
+.msg-name.aria-name{color:#B8A8FF}
+.lang-tag{font-size:10px;padding:1px 7px;border-radius:10px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac)}
+.bubble{padding:11px 15px;border-radius:var(--r-md);font-size:13.5px;line-height:1.68;word-break:break-word}
+.msg.user .bubble{background:linear-gradient(135deg,#7C5CFC 0%,#9B7DFF 100%);color:#fff;border-bottom-right-radius:3px}
+.msg.aria .bubble{background:var(--s2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px}
+.bubble-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;margin-top:2px;padding:0 4px}
+.msg:hover .bubble-actions{opacity:1}
+.bubble-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s;font-family:var(--font-b)}
+.bubble-btn:hover{background:var(--s3);color:var(--text2);border-color:var(--border-lit)}
+.bubble-btn i{font-size:12px}
 
-    .input-row{display:flex;align-items:center;gap:10px}
-    .text-input-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:12px;padding:0 12px;transition:border-color 0.15s}
-    .text-input-wrap:focus-within{border-color:rgba(124,93,249,0.4)}
-    .text-input-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;padding:11px 0;font-family:'Segoe UI',sans-serif}
-    .text-input-wrap input::placeholder{color:var(--text3)}
-    .attach-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;transition:color 0.15s;display:flex;align-items:center}
-    .attach-btn:hover{color:var(--text2)}
-    .mic-btn{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6d3ff5,#8b63fa);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
-    .mic-btn:hover{opacity:0.9;transform:scale(1.03)}
-    .mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:micPulse 1.5s infinite}
-    @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 10px rgba(231,76,60,0)}}
-    .send-btn{width:42px;height:42px;border-radius:12px;background:var(--surface2);border:0.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:16px;transition:all 0.15s;flex-shrink:0}
-    .send-btn:hover{background:var(--surface3);color:var(--text)}
-    .send-btn.ready{background:linear-gradient(135deg,#6d3ff5,#8b63fa);border-color:transparent;color:#fff}
+/* thinking */
+.thinking-bubble{padding:12px 15px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);border-bottom-left-radius:3px;display:flex;align-items:center;gap:10px}
+.thinking-dots{display:flex;gap:4px}
+.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:bounce 1.2s infinite}
+.thinking-dots span:nth-child(2){animation-delay:0.2s}
+.thinking-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+.thinking-label{font-size:12px;color:var(--text3);animation:fdt 2s infinite}
+@keyframes fdt{0%,100%{opacity:0.4}50%{opacity:1}}
 
-    .info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
-    .info-bar span{display:flex;align-items:center;gap:4px}
-    .info-bar i{font-size:12px}
-    .char-warn{color:#f59e0b !important}
+/* waveform */
+.waveform-wrap{display:none;align-items:center;gap:3px;height:24px}
+.waveform-wrap.active{display:flex}
+.waveform-wrap span{width:3px;border-radius:2px;background:var(--violet);animation:wv 1s infinite ease-in-out}
+.waveform-wrap span:nth-child(1){animation-delay:0.0s;height:6px}
+.waveform-wrap span:nth-child(2){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(3){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(4){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(5){animation-delay:0.4s;height:20px}
+.waveform-wrap span:nth-child(6){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(7){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(8){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(9){animation-delay:0.0s;height:6px}
+@keyframes wv{0%,100%{transform:scaleY(0.4);opacity:0.5}50%{transform:scaleY(1);opacity:1}}
 
-    .kbd{font-size:10px;padding:2px 5px;border-radius:4px;border:0.5px solid var(--border2);color:var(--text3);background:var(--surface3)}
-  </style>
+/* ── INPUT AREA ── */
+.bottom{border-top:1px solid var(--border);padding:14px 22px 18px;display:flex;flex-direction:column;gap:10px;background:var(--s0);flex-shrink:0}
+.status-row{display:flex;align-items:center;justify-content:center;min-height:28px;gap:8px}
+.status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.status.active{color:var(--lilac)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:sdot 1.5s infinite;display:inline-block;flex-shrink:0}
+@keyframes sdot{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.input-row{display:flex;align-items:center;gap:8px}
+.text-input-wrap{flex:1;display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-lg);padding:0 8px 0 14px;transition:border-color 0.2s}
+.text-input-wrap:focus-within{border-color:var(--border-lit);background:var(--s1)}
+.text-input-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:13.5px;padding:11px 0;font-family:var(--font-b)}
+.text-input-wrap input::placeholder{color:var(--text3)}
+.attach-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:17px;padding:4px;display:flex;align-items:center;transition:color 0.15s;border-radius:6px}
+.attach-btn:hover{color:var(--text2)}
+.mic-btn{width:42px;height:42px;border-radius:13px;background:var(--violet);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
+.mic-btn:hover{transform:scale(1.04);box-shadow:0 0 16px rgba(124,92,252,0.45)}
+.mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:mpulse 1.5s infinite}
+@keyframes mpulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 10px rgba(231,76,60,0)}}
+.send-btn{width:38px;height:38px;border-radius:11px;background:transparent;border:1px solid var(--border-lit);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:15px;transition:all 0.15s;flex-shrink:0}
+.send-btn:hover{background:var(--violet-dim)}
+.send-btn.ready{background:var(--violet);border-color:transparent;color:#fff}
+
+.info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
+.info-bar span{display:flex;align-items:center;gap:4px}
+.info-bar i{font-size:12px}
+.char-warn{color:#f59e0b!important}
+.kbd{font-size:10px;padding:1px 5px;border-radius:4px;border:1px solid var(--border-lit);color:var(--text3);background:var(--s2);font-family:var(--font-b)}
+</style>
 </head>
 <body>
 
 <header>
-  <div class="logo-mark">🎙</div>
+  <div class="logo-icon"><i class="ti ti-microphone"></i></div>
   <div>
     <div class="logo-text">ARIA</div>
     <div class="logo-sub">AI Real-time Intelligent Assistant</div>
@@ -130,7 +202,9 @@
 </header>
 
 <div class="main-wrap">
-  <div class="sidebar">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
     <div class="sidebar-label">Session</div>
     <div class="sidebar-item active">
       <i class="ti ti-message-circle"></i> Current chat
@@ -160,22 +234,41 @@
     </div>
 
     <div class="sidebar-divider"></div>
-    <div class="sidebar-label">Model</div>
-    <div class="sidebar-item" style="cursor:default">
-      <i class="ti ti-bolt"></i> LLaMA 3.3-70B
-      <span class="model-live">Live</span>
+    <div class="sidebar-footer">
+      <div class="model-card">
+        <div class="model-card-lbl">Active models</div>
+        <div class="model-row-inner">
+          <div class="model-name-inner"><div class="model-dot"></div>LLaMA 3.3-70B</div>
+          <span class="model-live">Live</span>
+        </div>
+        <div class="model-row-inner" style="margin-top:5px">
+          <div class="model-name-inner"><div class="model-dot dim"></div>Faster-Whisper</div>
+        </div>
+      </div>
     </div>
-    <div class="sidebar-item" style="cursor:default">
-      <i class="ti ti-ear"></i> Faster-Whisper
-    </div>
-  </div>
+  </aside>
 
+  <!-- CHAT -->
   <div class="chat-area">
+    <div class="topbar">
+      <div class="session-pill">
+        <div class="s-dot"></div>
+        Private session
+      </div>
+      <div class="topbar-right">
+        <button class="lang-btn" id="topLangBtn">
+          <i class="ti ti-world"></i> EN
+        </button>
+        <button class="icon-btn" title="Refresh" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+        <button class="icon-btn" title="Export" onclick="exportChat()"><i class="ti ti-download"></i></button>
+      </div>
+    </div>
+
     <div class="messages" id="messages">
       <div class="empty-state" id="emptyState">
-        <div class="empty-orb">🎙</div>
+        <div class="empty-orb"><i class="ti ti-microphone"></i></div>
         <h3>Start a conversation</h3>
-        <p>Tap the mic to speak, or type a message. ARIA understands 99 languages automatically.</p>
+        <p>Tap the mic to speak, or type a message.<br>ARIA understands 99 languages automatically.</p>
         <div class="suggestion-chips">
           <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
           <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
@@ -187,8 +280,9 @@
 
     <div class="bottom">
       <div class="status-row">
-        <div class="waveform" id="waveform">
+        <div class="waveform-wrap" id="waveform">
           <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
         </div>
         <div class="status" id="status">
           <i class="ti ti-microphone"></i> Tap mic to speak &nbsp;<span class="kbd">Space</span>
@@ -200,7 +294,7 @@
             <i class="ti ti-paperclip"></i>
           </button>
           <input type="text" id="textInput"
-            placeholder="Message ARIA... (Enter to send)"
+            placeholder="Message ARIA… (Enter to send)"
             maxlength="500"
             oninput="onInput()"
             onkeydown="handleKey(event)" />
@@ -213,7 +307,7 @@
         </button>
       </div>
       <div class="info-bar">
-        <span><i class="ti ti-lock"></i> Private session</span>
+        <span><i class="ti ti-lock"></i> Private · data not stored</span>
         <span id="charCount"></span>
         <span id="msgCount">0 messages</span>
         <span><i class="ti ti-server"></i> Render · Groq</span>
@@ -228,7 +322,6 @@
   let mediaRecorder = null, audioChunks = [], recording = false;
   let msgCount = 0, autoSpeak = true;
 
-  // Keyboard shortcut: Space = toggle mic (when input not focused)
   document.addEventListener("keydown", e => {
     if (e.code === "Space" && document.activeElement !== document.getElementById("textInput")) {
       e.preventDefault();
@@ -242,48 +335,53 @@
 
   function setStatus(html, active = false) {
     const s = document.getElementById("status");
-    s.innerHTML = (active ? '<span class="status-dot"></span> ' : '') + html;
+    s.innerHTML = (active ? '<span class="status-dot"></span> ' : '<i class="ti ti-microphone"></i> ') + html;
     s.className = "status" + (active ? " active" : "");
   }
 
   function onInput() {
-    const input = document.getElementById("textInput");
-    const v = input.value;
-    const len = v.length;
+    const v = document.getElementById("textInput").value;
     document.getElementById("sendBtn").className = "send-btn" + (v.trim() ? " ready" : "");
-
-    // Character counter
     const cc = document.getElementById("charCount");
-    if (len > 0) {
-      cc.textContent = len + "/500";
-      cc.className = len > 400 ? "char-warn" : "";
-    } else {
-      cc.textContent = "";
-    }
+    if (v.length > 0) { cc.textContent = v.length + "/500"; cc.className = v.length > 400 ? "char-warn" : ""; }
+    else { cc.textContent = ""; }
   }
 
-  function clearEmpty() {
-    document.getElementById("emptyState")?.remove();
+  function clearEmpty() { document.getElementById("emptyState")?.remove(); }
+
+  function addDateDivider() {
+    const d = document.createElement("div");
+    d.className = "date-div";
+    const now = new Date();
+    d.innerHTML = `<span>Today · ${now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>`;
+    document.getElementById("messages").appendChild(d);
   }
 
   function addMsg(role, text, lang = null) {
+    if (msgCount === 0) addDateDivider();
     clearEmpty();
     const d = document.createElement("div");
     d.className = "msg " + role;
     const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const langTag = lang ? `<span class="lang-tag"><i class="ti ti-language"></i> ${lang.toUpperCase()}</span>` : "";
-    const actions = role === "aria" ? `
+    const isUser = role === "user";
+    const avatarClass = isUser ? "av-user" : "av-aria";
+    const avatarText = isUser ? "Y" : "AR";
+    const nameHtml = isUser ? '<span class="msg-name">You</span>' : '<span class="msg-name aria-name">ARIA</span>';
+    const actions = !isUser ? `
       <div class="bubble-actions">
         <button class="bubble-btn" onclick="copyText(this)"><i class="ti ti-copy"></i> Copy</button>
         <button class="bubble-btn" onclick="speakText(this)"><i class="ti ti-volume"></i> Speak</button>
       </div>` : "";
     d.innerHTML = `
-      <div class="msg-meta">
-        ${role === "user" ? "You" : '<i class="ti ti-robot"></i> ARIA'} · ${time} ${langTag}
-      </div>
-      <div class="bubble">${text}</div>
-      ${actions}
-    `;
+      <div class="msg-row">
+        <div class="msg-avatar ${avatarClass}">${avatarText}</div>
+        <div class="msg-content">
+          <div class="msg-meta">${nameHtml}<span>${time}</span>${langTag}</div>
+          <div class="bubble">${text}</div>
+          ${actions}
+        </div>
+      </div>`;
     document.getElementById("messages").appendChild(d);
     d.scrollIntoView({ behavior: "smooth" });
     msgCount++;
@@ -296,10 +394,15 @@
     const d = document.createElement("div");
     d.className = "msg aria";
     d.innerHTML = `
-      <div class="msg-meta"><i class="ti ti-robot"></i> ARIA</div>
-      <div class="thinking-bubble">
-        <div class="thinking-dots"><span></span><span></span><span></span></div>
-        <span class="thinking-label">ARIA is thinking...</span>
+      <div class="msg-row">
+        <div class="msg-avatar av-aria">AR</div>
+        <div class="msg-content">
+          <div class="msg-meta"><span class="msg-name aria-name">ARIA</span></div>
+          <div class="thinking-bubble">
+            <div class="thinking-dots"><span></span><span></span><span></span></div>
+            <span class="thinking-label">ARIA is thinking…</span>
+          </div>
+        </div>
       </div>`;
     document.getElementById("messages").appendChild(d);
     d.scrollIntoView({ behavior: "smooth" });
@@ -317,18 +420,19 @@
   function speakText(btn) {
     const text = btn.closest(".msg").querySelector(".bubble").textContent.trim();
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(u);
+    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
   }
 
   function setLang(lang) {
+    if (!lang) return;
     const b = document.getElementById("langBadge");
-    if (lang) { b.textContent = lang.toUpperCase(); b.className = "lang-badge visible"; }
-    else { b.className = "lang-badge"; }
+    b.textContent = lang.toUpperCase();
+    b.className = "lang-badge visible";
+    document.getElementById("topLangBtn").innerHTML = `<i class="ti ti-world"></i> ${lang.toUpperCase()}`;
   }
 
   function setWaveform(active) {
-    document.getElementById("waveform").className = "waveform" + (active ? " active" : "");
+    document.getElementById("waveform").className = "waveform-wrap" + (active ? " active" : "");
   }
 
   async function toggleRecording() {
@@ -348,7 +452,7 @@
         document.getElementById("micBtn").className = "mic-btn recording";
         document.getElementById("micIcon").className = "ti ti-player-stop";
         setWaveform(true);
-        setStatus("Listening... tap again to stop &nbsp;<span class='kbd'>Space</span>", true);
+        setStatus("Listening… tap again to stop &nbsp;<span class='kbd'>Space</span>", true);
       } catch (e) {
         setStatus("Microphone access denied");
       }
@@ -357,7 +461,7 @@
       recording = false;
       document.getElementById("micBtn").className = "mic-btn";
       document.getElementById("micIcon").className = "ti ti-microphone";
-      setStatus("Processing...", true);
+      setStatus("Processing…", true);
     }
   }
 
@@ -378,7 +482,7 @@
       if (autoSpeak) {
         const audioBlob = await res.blob();
         const audio = new Audio(URL.createObjectURL(audioBlob));
-        setStatus('<i class="ti ti-volume"></i> ARIA is speaking...', true);
+        setStatus('<i class="ti ti-volume"></i> ARIA is speaking…', true);
         audio.onended = () => setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
         audio.play();
       } else {
@@ -398,7 +502,7 @@
     input.value = ""; onInput();
     addMsg("user", text);
     const thinking = addThinking();
-    setStatus("Processing...", true);
+    setStatus("Processing…", true);
     try {
       const res = await fetch(`${API}/chat/text?session_id=${sessionId}`, {
         method: "POST",
@@ -424,9 +528,9 @@
 
   const emptyHTML = `
     <div class="empty-state" id="emptyState">
-      <div class="empty-orb">🎙</div>
+      <div class="empty-orb"><i class="ti ti-microphone"></i></div>
       <h3>Start a conversation</h3>
-      <p>Tap the mic to speak, or type a message. ARIA understands 99 languages automatically.</p>
+      <p>Tap the mic to speak, or type a message.<br>ARIA understands 99 languages automatically.</p>
       <div class="suggestion-chips">
         <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
         <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
@@ -441,7 +545,7 @@
     msgCount = 0;
     document.getElementById("msgCount").textContent = "0 messages";
     document.getElementById("charCount").textContent = "";
-    setLang(null);
+    document.getElementById("langBadge").className = "lang-badge";
     setWaveform(false);
     setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
   }
