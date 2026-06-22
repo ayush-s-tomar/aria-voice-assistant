@@ -26,18 +26,31 @@ Pipeline: `Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS TTS
 
 ## 🗂️ Project Structure
 aria-voice-assistant/
+
 ├── backend/
+
 │   ├── main.py                  # FastAPI app (3 endpoints)
+
 │   ├── requirements.txt
+
 │   ├── .env.example
+
 │   └── services/
+
 │       ├── transcriber.py       # Groq Whisper large-v3 STT (99 languages)
+
 │       ├── llm.py               # Groq LLaMA with rolling memory
+
 │       └── tts.py               # gTTS (free) / ElevenLabs (premium)
+
 ├── frontend/
+
 │   └── index.html               # Single-file voice UI (no framework)
+
 ├── docs/                        # GitHub Pages deployment
+
 ├── render.yaml                  # One-click Render deploy config
+
 └── README.md
 ---
 
@@ -46,7 +59,7 @@ aria-voice-assistant/
 | Layer | Tech |
 |-------|------|
 | STT | Groq Whisper large-v3 (cloud, free, 99 languages) |
-| LLM | Groq + LLaMA-3.3-70B |
+| LLM | Groq + LLaMA 3.3-70B |
 | TTS | gTTS (free) / ElevenLabs (premium) |
 | API | FastAPI + Uvicorn |
 | Frontend | Vanilla HTML/CSS/JS |
@@ -89,7 +102,7 @@ ELEVENLABS_API_KEY=       # optional — leave blank to use free gTTS
 uvicorn main:app --reload --port 8000
 ```
 
-Then open `frontend/index.html` in Chrome.
+Then open `frontend/index.html` in Chrome (double-click or drag into browser).
 
 ---
 
