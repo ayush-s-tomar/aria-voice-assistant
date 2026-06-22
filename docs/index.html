@@ -241,7 +241,7 @@ header{display:flex;align-items:center;gap:12px;padding:13px 22px;background:var
           <span class="model-live">Live</span>
         </div>
         <div class="model-row-inner" style="margin-top:5px">
-          <div class="model-name-inner"><div class="model-dot dim"></div>Faster-Whisper</div>
+          <div class="model-name-inner"><div class="model-dot dim"></div>Groq Whisper</div>
         </div>
       </div>
     </div>
@@ -425,7 +425,7 @@ setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
   function setLang(lang) {
     if (!lang) return;
     const b = document.getElementById("langBadge");
-    b.textContent = lang.toUpperCase();
+    b.textContent = lang.slice(0,2).toUpperCase();
     b.className = "lang-badge visible";
     document.getElementById("topLangBtn").innerHTML = `<i class="ti ti-world"></i> ${lang.toUpperCase()}`;
   }
