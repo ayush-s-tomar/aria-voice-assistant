@@ -317,6 +317,7 @@ header{display:flex;align-items:center;gap:12px;padding:13px 22px;background:var
 
 <script>
   const API = "https://aria-voice-assistant-6eze.onrender.com";
+setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
   const sessionId = "session_" + Math.random().toString(36).slice(2, 8);
   let mediaRecorder = null, audioChunks = [], recording = false;
   let msgCount = 0, autoSpeak = true;
