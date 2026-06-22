@@ -427,7 +427,7 @@ setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
     const b = document.getElementById("langBadge");
     b.textContent = lang.slice(0,2).toUpperCase();
     b.className = "lang-badge visible";
-    document.getElementById("topLangBtn").innerHTML = `<i class="ti ti-world"></i> ${lang.toUpperCase()}`;
+    document.getElementById("topLangBtn").innerHTML = `<i class="ti ti-world"></i> ${lang.slice(0,2).toUpperCase()}`;
   }
 
   function setWaveform(active) {
