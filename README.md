@@ -1,11 +1,15 @@
 # 🎙️ ARIA – Voice AI Assistant
 
-**Speech-to-Speech AI assistant** built with Faster-Whisper + Groq LLaMA + gTTS  
-Pipeline: `Your voice → Faster-Whisper STT → LLM (Groq) → gTTS TTS → Voice response`
+**Speech-to-Speech AI assistant** built with Groq Whisper + LLaMA 3.3-70B + gTTS  
+Pipeline: `Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS TTS → Voice response`
 
 🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)  
 ⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)  
 📖 **API Docs:** [aria-voice-assistant-6eze.onrender.com/docs](https://aria-voice-assistant-6eze.onrender.com/docs)
+
+---
+
+![ARIA Demo](docs/demo.png)
 
 ---
 
@@ -15,21 +19,19 @@ Pipeline: `Your voice → Faster-Whisper STT → LLM (Groq) → gTTS TTS → Voi
 - 🌍 **99-language support** — speak in Hindi, Spanish, French, English, and more — auto-detected
 - 🧠 **Conversation memory** — ARIA remembers context across turns in a session
 - 🔊 **Voice output** — responses spoken aloud via gTTS (or ElevenLabs for premium voice)
-- ⚡ **Fast inference** — Groq LLaMA-3.3-70B for near-instant responses
+- ⚡ **Fast inference** — Groq Whisper large-v3 + LLaMA 3.3-70B for near-instant responses
 - 💬 **Text fallback** — type messages if mic isn't available
 
 ---
 
 ## 🗂️ Project Structure
-
-```
 aria-voice-assistant/
 ├── backend/
 │   ├── main.py                  # FastAPI app (3 endpoints)
 │   ├── requirements.txt
 │   ├── .env.example
 │   └── services/
-│       ├── transcriber.py       # Faster-Whisper STT (99 languages)
+│       ├── transcriber.py       # Groq Whisper large-v3 STT (99 languages)
 │       ├── llm.py               # Groq LLaMA with rolling memory
 │       └── tts.py               # gTTS (free) / ElevenLabs (premium)
 ├── frontend/
@@ -37,15 +39,13 @@ aria-voice-assistant/
 ├── docs/                        # GitHub Pages deployment
 ├── render.yaml                  # One-click Render deploy config
 └── README.md
-```
-
 ---
 
 ## 🔋 Tech Stack
 
 | Layer | Tech |
 |-------|------|
-| STT | Faster-Whisper (local, free, 99 languages) |
+| STT | Groq Whisper large-v3 (cloud, free, 99 languages) |
 | LLM | Groq + LLaMA-3.3-70B |
 | TTS | gTTS (free) / ElevenLabs (premium) |
 | API | FastAPI + Uvicorn |
@@ -59,12 +59,6 @@ aria-voice-assistant/
 ### Prerequisites
 - Python 3.11
 - Groq API key → [console.groq.com](https://console.groq.com)
-- ffmpeg installed
-
-```powershell
-# Install ffmpeg (Windows)
-winget install ffmpeg
-```
 
 ### Step 1 — Clone & Setup
 
@@ -86,7 +80,6 @@ copy .env.example .env
 Edit `.env`:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
-WHISPER_MODEL=base        # tiny | base | small | medium
 ELEVENLABS_API_KEY=       # optional — leave blank to use free gTTS
 ```
 
@@ -96,7 +89,7 @@ ELEVENLABS_API_KEY=       # optional — leave blank to use free gTTS
 uvicorn main:app --reload --port 8000
 ```
 
-Then open `frontend/index.html` in Chrome (double-click or drag into browser).
+Then open `frontend/index.html` in Chrome.
 
 ---
 
@@ -117,8 +110,7 @@ Then open `frontend/index.html` in Chrome (double-click or drag into browser).
 2. Go to [render.com](https://render.com) → New → Web Service
 3. Connect your fork — `render.yaml` is auto-detected
 4. Add env var: `GROQ_API_KEY` in Render dashboard
-5. Set `WHISPER_MODEL=tiny` (recommended for free tier)
-6. Deploy
+5. Deploy
 
 ### Frontend → GitHub Pages
 1. Update `const API` in `frontend/index.html` with your Render URL
@@ -137,9 +129,7 @@ Each browser tab generates a unique `session_id`. The backend maintains a rollin
 
 1. Get API key at [elevenlabs.io](https://elevenlabs.io)
 2. Add to `.env`:
-   ```
-   ELEVENLABS_API_KEY=your_key_here
-   ```
+ELEVENLABS_API_KEY=your_key_here
 3. Restart backend — switches automatically, no code changes needed
 
 ---
