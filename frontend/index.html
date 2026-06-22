@@ -363,7 +363,7 @@ setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
     const d = document.createElement("div");
     d.className = "msg " + role;
     const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const langTag = lang ? `<span class="lang-tag"><i class="ti ti-language"></i> ${lang.toUpperCase()}</span>` : "";
+    const langTag = lang ? `<span class="lang-tag"><i class="ti ti-language"></i> ${lang.slice(0,2).toUpperCase()}</span>` : "";
     const isUser = role === "user";
     const avatarClass = isUser ? "av-user" : "av-aria";
     const avatarText = isUser ? "Y" : "AR";
