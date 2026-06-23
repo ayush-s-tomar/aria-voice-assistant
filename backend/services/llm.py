@@ -1,51 +1,34 @@
-"""
-LLM service using Groq (same API you used in StartupScope & AgentLoop).
-Maintains rolling conversation history for memory across turns.
-"""
-from groq import Groq
+# backend/services/llm.py
 import os
+from groq import Groq
 
-client = Groq(api_key=os.environ["GROQ_API_KEY"])
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-SYSTEM_PROMPT = """You are ARIA (AI Real-time Intelligent Assistant) — a friendly, concise voice assistant.
-
-Rules:
-- Keep responses SHORT (2-4 sentences max) since they will be spoken aloud.
-- Be conversational and natural, like a real voice assistant.
-- Avoid bullet points, markdown, or lists — plain sentences only.
-- If asked your name, say you are ARIA.
-- Remember context from earlier in the conversation.
-"""
-
-MAX_HISTORY = 20  # keep last 10 exchanges (20 messages)
+SYSTEM_PROMPT = """You are ARIA, a helpful, concise, and friendly voice AI assistant.
+Keep responses conversational and brief — you're speaking aloud, not writing text.
+Avoid markdown, bullet points, or lists in your responses."""
 
 
-def chat_with_memory(
-    user_message: str,
-    history: list[dict],
-    model: str = "llama-3.3-70b-versatile",
-) -> tuple[str, list[dict]]:
-    """
-    Send a message with history and return (assistant_reply, updated_history).
-    """
-    # Append user message
-    history = history + [{"role": "user", "content": user_message}]
+def chat_with_memory(user_message: str, history: list) -> tuple[str, list]:
+    """Takes message + history, returns (assistant_reply, updated_history).
+    Redis persistence is handled by main.py via memory.py — not here."""
 
-    # Trim history to avoid token overflow
-    if len(history) > MAX_HISTORY:
-        history = history[-MAX_HISTORY:]
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
 
     response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history,
+        model="llama-3.3-70b-versatile",
+        messages=messages,
+        max_tokens=500,
         temperature=0.7,
-        max_tokens=300,
     )
 
-    assistant_reply = response.choices[0].message.content.strip()
-    print(f"[LLM] Response: {assistant_reply}")
+    assistant_reply = response.choices[0].message.content
 
-    # Append assistant reply to history
-    history = history + [{"role": "assistant", "content": assistant_reply}]
+    updated_history = history + [
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": assistant_reply},
+    ]
 
-    return assistant_reply, history
+    return assistant_reply, updated_history
