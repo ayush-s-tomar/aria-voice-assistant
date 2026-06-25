@@ -1,3 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — AI Real-time Intelligent Assistant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#07070D;
+  --s0:#0E0E1A;
+  --s1:#141422;
+  --s2:#1C1C2E;
+  --s3:#242438;
+  --border:rgba(120,100,255,0.12);
+  --border-lit:rgba(120,100,255,0.28);
+  --violet:#7C5CFC;
+  --violet-dim:rgba(124,92,252,0.15);
+  --violet-glow:rgba(124,92,252,0.08);
+  --lilac:#C084FC;
+  --text:#EEEAF8;
+  --text2:#9B93B8;
+  --text3:#5C5478;
+  --green:#34D399;
+  --green-dim:rgba(52,211,153,0.12);
+  --red:#F87171;
+  --font-d:'Space Grotesk',system-ui,sans-serif;
+  --font-b:'Inter',system-ui,sans-serif;
+  --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
+}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:12px;padding:13px 22px;background:var(--s0);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;flex-shrink:0}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon i{font-size:17px;color:#fff}
+.logo-text{font-family:var(--font-d);font-size:16px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.05em;text-transform:uppercase}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac);display:none;font-weight:500;letter-spacing:0.04em}
+.lang-badge.visible{display:block}
+.icon-btn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
+.icon-btn:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border-lit)}
+
+/* ── LAYOUT ── */
+.main-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;background:var(--s0)}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
+.sidebar-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:10px 8px 4px;font-weight:500}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:12.5px;color:var(--text2);transition:all 0.15s;border:1px solid transparent;user-select:none}
+.sidebar-item:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border)}
+.sidebar-item.active{background:var(--violet-dim);color:#B8A8FF;border-color:var(--border-lit)}
+.sidebar-item i{font-size:14px;flex-shrink:0;opacity:0.8}
+.sidebar-item.active i{opacity:1}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 2px}
+.session-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);margin-left:auto;flex-shrink:0;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:0.4}}
+.voice-label{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.2)}
+.voice-label.off{background:rgba(90,90,120,0.15);color:var(--text3);border-color:var(--border)}
+.model-live{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--violet-dim);color:var(--lilac);border:1px solid var(--border-lit)}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.model-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 13px;margin:0 2px}
+.model-card-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:7px}
+.model-row-inner{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2);padding:3px 0}
+.model-dot{width:5px;height:5px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-right:7px}
+.model-dot.dim{background:var(--text3)}
+.model-name-inner{display:flex;align-items:center}
+
+/* ── CHAT AREA ── */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--s0)}
+
+/* topbar */
+.topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.session-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--text2)}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{display:flex;align-items:center;gap:5px;padding:0 10px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;font-size:11.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;font-family:var(--font-b)}
+.lang-btn:hover{background:var(--violet-glow);border-color:var(--border-lit);color:var(--text)}
+.lang-btn i{font-size:13px}
+
+/* messages */
+.messages{flex:1;overflow-y:auto;padding:28px 28px 16px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
+
+/* empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;color:var(--text3);padding:40px 20px;text-align:center;min-height:300px}
+.empty-orb{width:68px;height:68px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:4px}
+.empty-orb i{font-size:28px;color:var(--violet)}
+.empty-state h3{font-family:var(--font-d);font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty-state p{font-size:13px;line-height:1.65;max-width:290px;color:var(--text2)}
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
+.chip:hover{border-color:var(--border-lit);color:#B8A8FF;background:var(--violet-dim)}
+
+/* date divider */
+.date-div{display:flex;align-items:center;gap:12px;margin:18px 0 20px}
+.date-div::before,.date-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.date-div span{font-size:10.5px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase}
+
+/* messages */
+.msg{display:flex;flex-direction:column;gap:0;animation:fadeUp 0.22s ease;margin-bottom:12px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-row{display:flex;align-items:flex-start;gap:10px;max-width:75%}
+.msg.user .msg-row{flex-direction:row-reverse;margin-left:auto}
+.msg.aria .msg-row{margin-right:auto}
+.msg-avatar{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;font-family:var(--font-d);margin-top:2px}
+.msg-avatar.av-aria{background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);color:#fff}
+.msg-avatar.av-user{background:var(--s3);border:1px solid var(--border);color:var(--text2)}
+.msg-content{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0 2px}
+.msg.user .msg-meta{justify-content:flex-end}
+.msg-name{color:var(--text2);font-weight:500}
+.msg-name.aria-name{color:#B8A8FF}
+.lang-tag{font-size:10px;padding:1px 7px;border-radius:10px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac)}
+.bubble{padding:11px 15px;border-radius:var(--r-md);font-size:13.5px;line-height:1.68;word-break:break-word}
+.msg.user .bubble{background:linear-gradient(135deg,#7C5CFC 0%,#9B7DFF 100%);color:#fff;border-bottom-right-radius:3px}
+.msg.aria .bubble{background:var(--s2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px}
+.bubble-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;margin-top:2px;padding:0 4px}
+.msg:hover .bubble-actions{opacity:1}
+.bubble-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s;font-family:var(--font-b)}
+.bubble-btn:hover{background:var(--s3);color:var(--text2);border-color:var(--border-lit)}
+.bubble-btn i{font-size:12px}
+
+/* thinking */
+.thinking-bubble{padding:12px 15px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);border-bottom-left-radius:3px;display:flex;align-items:center;gap:10px}
+.thinking-dots{display:flex;gap:4px}
+.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:bounce 1.2s infinite}
+.thinking-dots span:nth-child(2){animation-delay:0.2s}
+.thinking-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+.thinking-label{font-size:12px;color:var(--text3);animation:fdt 2s infinite}
+@keyframes fdt{0%,100%{opacity:0.4}50%{opacity:1}}
+
+/* waveform */
+.waveform-wrap{display:none;align-items:center;gap:3px;height:24px}
+.waveform-wrap.active{display:flex}
+.waveform-wrap span{width:3px;border-radius:2px;background:var(--violet);animation:wv 1s infinite ease-in-out}
+.waveform-wrap span:nth-child(1){animation-delay:0.0s;height:6px}
+.waveform-wrap span:nth-child(2){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(3){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(4){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(5){animation-delay:0.4s;height:20px}
+.waveform-wrap span:nth-child(6){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(7){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(8){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(9){animation-delay:0.0s;height:6px}
+@keyframes wv{0%,100%{transform:scaleY(0.4);opacity:0.5}50%{transform:scaleY(1);opacity:1}}
+
+/* wake word indicator */
+.wake-indicator{display:none;align-items:center;gap:6px;font-size:11.5px;color:var(--green);animation:fdt 2s infinite}
+.wake-indicator.active{display:flex}
+.wake-indicator i{font-size:13px}
+
+/* ── INPUT AREA ── */
+.bottom{border-top:1px solid var(--border);padding:14px 22px 18px;display:flex;flex-direction:column;gap:10px;background:var(--s0);flex-shrink:0}
+.status-row{display:flex;align-items:center;justify-content:center;min-height:28px;gap:8px}
+.status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.status.active{color:var(--lilac)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:sdot 1.5s infinite;display:inline-block;flex-shrink:0}
+@keyframes sdot{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.input-row{display:flex;align-items:center;gap:8px}
+.text-input-wrap{flex:1;display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-lg);padding:0 8px 0 14px;transition:border-color 0.2s}
+.text-input-wrap:focus-within{border-color:var(--border-lit);background:var(--s1)}
+.text-input-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:13.5px;padding:11px 0;font-family:var(--font-b)}
+.text-input-wrap input::placeholder{color:var(--text3)}
+.attach-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:17px;padding:4px;display:flex;align-items:center;transition:color 0.15s;border-radius:6px}
+.attach-btn:hover{color:var(--text2)}
+.mic-btn{width:42px;height:42px;border-radius:13px;background:var(--violet);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
+.mic-btn:hover{transform:scale(1.04);box-shadow:0 0 16px rgba(124,92,252,0.45)}
+.mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:mpulse 1.5s infinite}
+.mic-btn.wake-active{background:linear-gradient(135deg,#059669,#34D399);animation:mpulse-green 2s infinite}
+@keyframes mpulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 10px rgba(231,76,60,0)}}
+@keyframes mpulse-green{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0.4)}50%{box-shadow:0 0 0 10px rgba(52,211,153,0)}}
+.send-btn{width:38px;height:38px;border-radius:11px;background:transparent;border:1px solid var(--border-lit);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:15px;transition:all 0.15s;flex-shrink:0}
+.send-btn:hover{background:var(--violet-dim)}
+.send-btn.ready{background:var(--violet);border-color:transparent;color:#fff}
+
+.info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
+.info-bar span{display:flex;align-items:center;gap:4px}
+.info-bar i{font-size:12px}
+.char-warn{color:#f59e0b!important}
+.kbd{font-size:10px;padding:1px 5px;border-radius:4px;border:1px solid var(--border-lit);color:var(--text3);background:var(--s2);font-family:var(--font-b)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon"><i class="ti ti-microphone"></i></div>
+  <div>
+    <div class="logo-text">ARIA</div>
+    <div class="logo-sub">AI Real-time Intelligent Assistant</div>
+  </div>
+  <div class="header-right">
+    <div class="lang-badge" id="langBadge">EN</div>
+    <button class="icon-btn" title="Export chat" onclick="exportChat()"><i class="ti ti-download"></i></button>
+    <button class="icon-btn" title="Clear chat" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+  </div>
+</header>
+
+<div class="main-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Session</div>
+    <div class="sidebar-item active">
+      <i class="ti ti-message-circle"></i> Current chat
+      <div class="session-dot"></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Quick actions</div>
+    <div class="sidebar-item" onclick="insertChip('Summarize our conversation so far')">
+      <i class="ti ti-sparkles"></i> Summarize chat
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Translate your last reply to Hindi')">
+      <i class="ti ti-language"></i> Translate reply
+    </div>
+    <div class="sidebar-item" onclick="exportChat()">
+      <i class="ti ti-download"></i> Export chat
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Voice</div>
+    <div class="sidebar-item" onclick="toggleVoiceMode()">
+      <i class="ti ti-volume"></i> Auto-speak
+      <span class="voice-label" id="voiceModeLabel">ON</span>
+    </div>
+    <div class="sidebar-item" onclick="toggleWakeWord()" id="wakeWordBtn">
+      <i class="ti ti-ear-off"></i> Hey ARIA
+      <span class="voice-label off" id="wakeWordLabel">OFF</span>
+    </div>
+    <div class="sidebar-item" onclick="insertChip('What languages can you understand and speak?')">
+      <i class="ti ti-world"></i> 99 languages
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Tools</div>
+    <div class="sidebar-item" onclick="insertChip('Search the web for latest AI news today')">
+      <i class="ti ti-search"></i> Web search
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Calculate 15% of 8500')">
+      <i class="ti ti-calculator"></i> Calculator
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-footer">
+      <div class="model-card">
+        <div class="model-card-lbl">Active models</div>
+        <div class="model-row-inner">
+          <div class="model-name-inner"><div class="model-dot"></div>LLaMA 3.3-70B</div>
+          <span class="model-live">Live</span>
+        </div>
+        <div class="model-row-inner" style="margin-top:5px">
+          <div class="model-name-inner"><div class="model-dot dim"></div>Groq Whisper</div>
+        </div>
+        <div class="model-row-inner" style="margin-top:5px">
+          <div class="model-name-inner"><div class="model-dot dim"></div>Tavily Search</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="topbar">
+      <div class="session-pill">
+        <div class="s-dot"></div>
+        Private session
+      </div>
+      <div class="topbar-right">
+        <button class="lang-btn" id="topLangBtn">
+          <i class="ti ti-world"></i> EN
+        </button>
+        <button class="icon-btn" title="Refresh" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+        <button class="icon-btn" title="Export" onclick="exportChat()"><i class="ti ti-download"></i></button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-orb"><i class="ti ti-microphone"></i></div>
+        <h3>Start a conversation</h3>
+        <p>Tap the mic to speak, or say <strong style="color:var(--lilac)">"Hey ARIA"</strong> to go hands-free.<br>ARIA understands 99 languages automatically.</p>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+          <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+          <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+          <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+          <div class="chip" onclick="insertChip('Search the web for latest AI news')">Latest AI news</div>
+          <div class="chip" onclick="insertChip('Calculate 20% of 5000')">Quick calculate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="status-row">
+        <div class="waveform-wrap" id="waveform">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="status" id="status">
+          <i class="ti ti-microphone"></i> Tap mic to speak &nbsp;<span class="kbd">Space</span>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="text-input-wrap">
+          <button class="attach-btn" title="Attach (coming soon)" onclick="alert('File upload coming soon!')">
+            <i class="ti ti-paperclip"></i>
+          </button>
+          <input type="text" id="textInput"
+            placeholder="Message ARIA… (Enter to send)"
+            maxlength="500"
+            oninput="onInput()"
+            onkeydown="handleKey(event)" />
+        </div>
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Record voice (Space)">
+          <i class="ti ti-microphone" id="micIcon"></i>
+        </button>
+        <button class="send-btn" id="sendBtn" onclick="sendText()" title="Send (Enter)">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+      <div class="info-bar">
+        <span><i class="ti ti-lock"></i> Private · Redis memory</span>
+        <span id="charCount"></span>
+        <span id="msgCount">0 messages</span>
+        <span><i class="ti ti-server"></i> Render · Groq · Tavily</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
 const API = "https://aria-voice-assistant-6eze.onrender.com";
 const WS_API = "wss://aria-voice-assistant-6eze.onrender.com";
 setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
@@ -12,9 +355,96 @@ if (!sessionId) {
 let mediaRecorder = null, audioChunks = [], recording = false;
 let msgCount = 0, autoSpeak = true;
 let ws = null, wsReady = false;
-let currentAriaMsg = null;   // live message bubble being streamed
-let audioQueue = [];         // chunks waiting to play
-let isPlaying = false;
+let currentAriaMsg = null;
+let audioQueue = [], isPlaying = false;
+
+// ── Wake Word ("Hey ARIA") ────────────────────────────────────────────────────
+
+let wakeRecognition = null;
+let wakeWordEnabled = false;
+
+function startWakeWord() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Wake word requires Chrome browser.");
+    return;
+  }
+  wakeRecognition = new SpeechRecognition();
+  wakeRecognition.continuous = true;
+  wakeRecognition.interimResults = true;
+  wakeRecognition.lang = "en-US";
+
+  wakeRecognition.onresult = (event) => {
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript.toLowerCase().trim();
+      if (
+        transcript.includes("hey aria") ||
+        transcript.includes("hey area") ||
+        transcript.includes("hey arya") ||
+        transcript.includes("ok aria") ||
+        transcript.includes("hi aria")
+      ) {
+        if (!recording && !isPlaying) {
+          wakeRecognition.stop();
+          setStatus('👂 "Hey ARIA" detected — listening…', true);
+          setWaveform(true);
+          setTimeout(() => toggleRecording(), 300);
+        }
+      }
+    }
+  };
+
+  wakeRecognition.onend = () => {
+    if (wakeWordEnabled && !recording) {
+      setTimeout(() => { try { wakeRecognition.start(); } catch(e) {} }, 500);
+    }
+  };
+
+  wakeRecognition.onerror = (e) => {
+    if (e.error !== "no-speech" && e.error !== "aborted") console.warn("Wake word error:", e.error);
+  };
+
+  try { wakeRecognition.start(); } catch(e) {}
+}
+
+function stopWakeWord() {
+  if (wakeRecognition) { try { wakeRecognition.stop(); } catch(e) {} }
+}
+
+function toggleWakeWord() {
+  wakeWordEnabled = !wakeWordEnabled;
+  const btn = document.getElementById("wakeWordBtn");
+  const lbl = document.getElementById("wakeWordLabel");
+  const micBtn = document.getElementById("micBtn");
+
+  if (wakeWordEnabled) {
+    startWakeWord();
+    btn.innerHTML = '<i class="ti ti-ear"></i> Hey ARIA <span class="voice-label" id="wakeWordLabel">ON</span>';
+    micBtn.classList.add("wake-active");
+    setStatus('👂 Listening for "Hey ARIA"…');
+  } else {
+    stopWakeWord();
+    btn.innerHTML = '<i class="ti ti-ear-off"></i> Hey ARIA <span class="voice-label off" id="wakeWordLabel">OFF</span>';
+    micBtn.classList.remove("wake-active");
+    setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+  }
+}
+
+function resumeWakeWord() {
+  if (wakeWordEnabled && !recording) {
+    setTimeout(() => {
+      try { wakeRecognition.start(); } catch(e) {}
+      setStatus('👂 Listening for "Hey ARIA"…');
+      document.getElementById("micBtn").classList.add("wake-active");
+    }, 1000);
+  }
+}
+
+function idleStatus() {
+  return wakeWordEnabled
+    ? '👂 Listening for "Hey ARIA"…'
+    : 'Tap mic to speak &nbsp;<span class="kbd">Space</span>';
+}
 
 // ── WebSocket ─────────────────────────────────────────────────────────────────
 
@@ -23,7 +453,7 @@ function connectWebSocket() {
 
   ws.onopen = () => {
     wsReady = true;
-    setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+    setStatus(idleStatus());
   };
 
   ws.onmessage = (event) => {
@@ -33,18 +463,14 @@ function connectWebSocket() {
       setStatus(msg.text, true);
 
     } else if (msg.type === "transcript") {
-      // Show user's words immediately
       addMsg("user", msg.text, msg.lang);
       if (msg.lang) setLang(msg.lang);
-      // Start empty ARIA bubble for streaming
       currentAriaMsg = addStreamingMsg();
 
     } else if (msg.type === "token") {
-      // Append token to live ARIA bubble
       if (currentAriaMsg) appendToken(currentAriaMsg, msg.text);
 
     } else if (msg.type === "audio_chunk") {
-      // Queue audio chunk and play
       if (autoSpeak) {
         const bytes = Uint8Array.from(atob(msg.data), c => c.charCodeAt(0));
         const blob = new Blob([bytes], { type: "audio/mpeg" });
@@ -53,24 +479,24 @@ function connectWebSocket() {
       }
 
     } else if (msg.type === "done") {
-      // Finalize bubble
       if (currentAriaMsg) finalizeMsg(currentAriaMsg, msg.text);
       currentAriaMsg = null;
       msgCount++;
       document.getElementById("msgCount").textContent =
         msgCount + " message" + (msgCount !== 1 ? "s" : "");
-      setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+      resumeWakeWord();
+      setStatus(idleStatus());
 
     } else if (msg.type === "error") {
       if (currentAriaMsg) currentAriaMsg.remove();
       addMsg("aria", "Error: " + msg.text);
+      resumeWakeWord();
       setStatus("Error");
     }
   };
 
   ws.onclose = () => {
     wsReady = false;
-    // Auto-reconnect after 2s
     setTimeout(connectWebSocket, 2000);
   };
 
@@ -113,7 +539,6 @@ function appendToken(msgEl, token) {
 }
 
 function finalizeMsg(msgEl, fullText) {
-  // Replace with proper bubble that has copy/speak actions
   const bubble = msgEl.querySelector(".bubble");
   bubble.innerHTML = fullText;
   const content = msgEl.querySelector(".msg-content");
@@ -184,7 +609,7 @@ function addMsg(role, text, lang = null) {
     </div>`;
   document.getElementById("messages").appendChild(d);
   d.scrollIntoView({ behavior: "smooth" });
-  if (role !== "aria") {  // aria msgs counted on "done" event
+  if (role !== "aria") {
     msgCount++;
     document.getElementById("msgCount").textContent = msgCount + " message" + (msgCount !== 1 ? "s" : "");
   }
@@ -194,6 +619,11 @@ function addMsg(role, text, lang = null) {
 async function toggleRecording() {
   if (!recording) {
     try {
+      // Pause wake word while recording
+      if (wakeWordEnabled) {
+        try { wakeRecognition.stop(); } catch(e) {}
+        document.getElementById("micBtn").classList.remove("wake-active");
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunks = [];
       mediaRecorder = new MediaRecorder(stream);
@@ -202,7 +632,6 @@ async function toggleRecording() {
         stream.getTracks().forEach(t => t.stop());
         setWaveform(false);
         const blob = new Blob(audioChunks, { type: "audio/webm" });
-        // Use WebSocket if connected, fallback to HTTP
         if (wsReady) {
           setStatus("Sending audio…", true);
           ws.send(await blob.arrayBuffer());
@@ -225,7 +654,6 @@ async function toggleRecording() {
   }
 }
 
-// HTTP fallback (keeps working if WebSocket fails)
 async function sendAudioHTTP(blob) {
   const fd = new FormData();
   fd.append("audio", blob, "recording.webm");
@@ -244,10 +672,11 @@ async function sendAudioHTTP(blob) {
       const audioBlob = await res.blob();
       const audio = new Audio(URL.createObjectURL(audioBlob));
       setStatus('<i class="ti ti-volume"></i> ARIA is speaking…', true);
-      audio.onended = () => setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+      audio.onended = () => { resumeWakeWord(); setStatus(idleStatus()); };
       audio.play();
     } else {
-      setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+      resumeWakeWord();
+      setStatus(idleStatus());
     }
   } catch (e) {
     thinking.remove();
@@ -293,7 +722,7 @@ async function sendText() {
     const data = await res.json();
     thinking.remove();
     addMsg("aria", data.assistant);
-    setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+    setStatus(idleStatus());
   } catch (e) {
     thinking.remove();
     addMsg("aria", "Connection error.");
@@ -337,12 +766,14 @@ const emptyHTML = `
   <div class="empty-state" id="emptyState">
     <div class="empty-orb"><i class="ti ti-microphone"></i></div>
     <h3>Start a conversation</h3>
-    <p>Tap the mic to speak, or type a message.<br>ARIA understands 99 languages automatically.</p>
+    <p>Tap the mic to speak, or say <strong style="color:var(--lilac)">"Hey ARIA"</strong> to go hands-free.<br>ARIA understands 99 languages automatically.</p>
     <div class="suggestion-chips">
       <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
       <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
       <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
       <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+      <div class="chip" onclick="insertChip('Search the web for latest AI news')">Latest AI news</div>
+      <div class="chip" onclick="insertChip('Calculate 20% of 5000')">Quick calculate</div>
     </div>
   </div>`;
 
@@ -354,7 +785,7 @@ function clearChat() {
   document.getElementById("charCount").textContent = "";
   document.getElementById("langBadge").className = "lang-badge";
   setWaveform(false);
-  setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+  setStatus(idleStatus());
 }
 
 function toggleVoiceMode() {
@@ -385,3 +816,6 @@ function exportChat() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 connectWebSocket();
+</script>
+</body>
+</html>
