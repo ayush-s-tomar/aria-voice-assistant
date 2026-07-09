@@ -1,21 +1,36 @@
 import os
 import json
 from groq import Groq
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 from services.tools import TOOLS, run_tool
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-SYSTEM_PROMPT = """You are ARIA, a helpful, concise, and friendly voice AI assistant.
+DEFAULT_SYSTEM_PROMPT = """You are {name}, a helpful, concise, and friendly voice AI assistant.
 Keep responses conversational and brief — you're speaking aloud, not writing text.
 Avoid markdown, bullet points, or lists in your responses.
 You have access to web search and a calculator. Use them when the user asks about
 current events, news, weather, prices, or math calculations."""
 
+# Set ARIA_NAME / ARIA_PERSONA_EXTRA in env to rebrand without touching code,
+# or pass a per-session override (see services/memory.set_session_persona).
+ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
+ARIA_PERSONA_EXTRA = os.getenv("ARIA_PERSONA_EXTRA", "")
 
-def chat_with_memory(user_message: str, history: list) -> tuple[str, list]:
+
+def build_system_prompt(persona_override: Optional[str] = None) -> str:
+    """Compose the system prompt, layering: override > env extras > default."""
+    base = DEFAULT_SYSTEM_PROMPT.format(name=ARIA_NAME)
+    if ARIA_PERSONA_EXTRA:
+        base += f"\n{ARIA_PERSONA_EXTRA}"
+    if persona_override:
+        base += f"\n{persona_override}"
+    return base
+
+
+def chat_with_memory(user_message: str, history: list, persona: Optional[str] = None) -> tuple[str, list]:
     """Non-streaming with tool use — used by HTTP endpoints."""
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": build_system_prompt(persona)}]
     messages.extend(history)
     messages.append({"role": "user", "content": user_message})
 
@@ -64,9 +79,9 @@ def chat_with_memory(user_message: str, history: list) -> tuple[str, list]:
     return assistant_reply, updated_history
 
 
-async def stream_llm_response(user_message: str, history: list) -> AsyncGenerator[str, None]:
+async def stream_llm_response(user_message: str, history: list, persona: Optional[str] = None) -> AsyncGenerator[str, None]:
     """Streaming with tool use — used by WebSocket endpoint."""
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": build_system_prompt(persona)}]
     messages.extend(history)
     messages.append({"role": "user", "content": user_message})
 

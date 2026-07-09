@@ -8,7 +8,14 @@ import tempfile, os, io, base64, json
 from services.transcriber import transcribe_audio
 from services.llm import chat_with_memory, stream_llm_response
 from services.tts import text_to_speech
-from services.memory import get_history, append_messages, clear_history, get_session_metadata
+from services.memory import (
+    get_history,
+    append_messages,
+    clear_history,
+    get_session_metadata,
+    get_session_persona,
+    set_session_persona,
+)
 from services.auth import get_github_auth_url, exchange_code_for_token, create_jwt, verify_jwt
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
@@ -16,7 +23,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 app = FastAPI(
     title="ARIA – Voice AI Assistant",
     description="Speech-to-speech AI pipeline: Groq Whisper → LLaMA 3.3-70B → gTTS",
-    version="3.0.0",
+    version="3.1.0",
 )
 
 app.add_middleware(
@@ -48,7 +55,7 @@ def user_session_id(user: dict, session_id: str) -> str:
 
 @app.get("/", tags=["Health"])
 def root():
-    return {"status": "ARIA is running", "version": "3.0.0"}
+    return {"status": "ARIA is running", "version": "3.1.0"}
 
 
 # ── Auth endpoints ────────────────────────────────────────────────────────────
@@ -141,11 +148,12 @@ async def websocket_voice(websocket: WebSocket, session_id: str):
 
                 await websocket.send_json({"type": "status", "text": "Thinking…"})
                 history = get_history(resolved_session)
+                persona = get_session_persona(resolved_session)
 
                 full_response = ""
                 sentence_buffer = ""
 
-                async for token in stream_llm_response(user_text, history):
+                async for token in stream_llm_response(user_text, history, persona=persona):
                     is_tool_status = token.startswith("\n[") and "…]" in token
                     if is_tool_status:
                         await websocket.send_json({"type": "token", "text": token})
@@ -203,7 +211,8 @@ async def voice_chat(
         if not user_text.strip():
             raise HTTPException(status_code=400, detail="Could not transcribe audio")
         history = get_history(resolved_session)
-        assistant_text, _ = chat_with_memory(user_text, history)
+        persona = get_session_persona(resolved_session)
+        assistant_text, _ = chat_with_memory(user_text, history, persona=persona)
         append_messages(resolved_session, user_text, assistant_text)
         audio_bytes = text_to_speech(assistant_text)
         user_header      = base64.b64encode(user_text.encode()).decode("ascii")
@@ -234,7 +243,8 @@ async def text_chat(
     if not user_text:
         raise HTTPException(status_code=400, detail="'message' field is required")
     history = get_history(resolved_session)
-    assistant_text, _ = chat_with_memory(user_text, history)
+    persona = get_session_persona(resolved_session)
+    assistant_text, _ = chat_with_memory(user_text, history, persona=persona)
     append_messages(resolved_session, user_text, assistant_text)
     return {"user": user_text, "assistant": assistant_text}
 
@@ -260,3 +270,19 @@ def clear_session(
     resolved_session = user_session_id(user, session_id) if user else session_id
     clear_history(resolved_session)
     return {"cleared": resolved_session}
+
+
+@app.put("/session/{session_id}/persona", tags=["Session"])
+def update_persona(
+    session_id: str,
+    payload: dict,
+    authorization: str = Header(default=None),
+):
+    """Let a user customize ARIA's tone/persona for this session."""
+    user = get_user_from_token(authorization)
+    resolved_session = user_session_id(user, session_id) if user else session_id
+    persona = payload.get("persona", "").strip()
+    if not persona:
+        raise HTTPException(status_code=400, detail="'persona' field is required")
+    set_session_persona(resolved_session, persona)
+    return {"session_id": resolved_session, "persona": persona}
