@@ -23,7 +23,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 app = FastAPI(
     title="ARIA – Voice AI Assistant",
     description="Speech-to-speech AI pipeline: Groq Whisper → LLaMA 3.3-70B → gTTS",
-    version="3.1.0",
+    version="3.2.0",
 )
 
 app.add_middleware(
@@ -55,7 +55,7 @@ def user_session_id(user: dict, session_id: str) -> str:
 
 @app.get("/", tags=["Health"])
 def root():
-    return {"status": "ARIA is running", "version": "3.1.0"}
+    return {"status": "ARIA is running", "version": "3.2.0"}
 
 
 # ── Auth endpoints ────────────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ async def websocket_voice(websocket: WebSocket, session_id: str):
                         sentence = sentence_buffer.strip()
                         if sentence:
                             await websocket.send_json({"type": "status", "text": "Speaking…"})
-                            audio_bytes = text_to_speech(sentence)
+                            audio_bytes = text_to_speech(sentence, lang=detected_lang)
                             await websocket.send_json({
                                 "type": "audio_chunk",
                                 "data": base64.b64encode(audio_bytes).decode(),
@@ -175,7 +175,7 @@ async def websocket_voice(websocket: WebSocket, session_id: str):
                         sentence_buffer = ""
 
                 if sentence_buffer.strip():
-                    audio_bytes = text_to_speech(sentence_buffer.strip())
+                    audio_bytes = text_to_speech(sentence_buffer.strip(), lang=detected_lang)
                     await websocket.send_json({
                         "type": "audio_chunk",
                         "data": base64.b64encode(audio_bytes).decode(),
@@ -214,7 +214,7 @@ async def voice_chat(
         persona = get_session_persona(resolved_session)
         assistant_text, _ = chat_with_memory(user_text, history, persona=persona)
         append_messages(resolved_session, user_text, assistant_text)
-        audio_bytes = text_to_speech(assistant_text)
+        audio_bytes = text_to_speech(assistant_text, lang=detected_lang)
         user_header      = base64.b64encode(user_text.encode()).decode("ascii")
         assistant_header = base64.b64encode(assistant_text.encode()).decode("ascii")
         return StreamingResponse(
