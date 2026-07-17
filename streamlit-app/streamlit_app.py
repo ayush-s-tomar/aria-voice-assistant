@@ -4,10 +4,11 @@ ARIA – Voice AI Assistant (Streamlit edition)
 Single-file deployment target: Streamlit Community Cloud (free).
 No FastAPI, no WebSocket server, no Render. Everything runs in one process.
 
-Pipeline: mic recording -> Groq Whisper STT -> LLaMA 3.3-70B (+ tools) -> gTTS -> spoken reply
+Pipeline: mic recording -> Groq Whisper STT -> LLaMA 3.3-70B (+ tools) -> gTTS/ElevenLabs -> spoken reply
 Memory: Upstash Redis (same DB as before) if configured, else in-session only.
 """
 
+import hashlib
 import os
 import tempfile
 import uuid
@@ -49,6 +50,9 @@ if "anon_session_id" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = []  # what's shown on screen this run
+
+if "_last_audio_hash" not in st.session_state:
+    st.session_state._last_audio_hash = None
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -93,6 +97,9 @@ with st.sidebar:
 
     st.divider()
     voice_choice = st.radio("Voice engine", ["Free (gTTS)", "ElevenLabs (needs key)"], index=0)
+    use_elevenlabs = voice_choice == "ElevenLabs (needs key)" and bool(os.getenv("ELEVENLABS_API_KEY"))
+    if voice_choice == "ElevenLabs (needs key)" and not os.getenv("ELEVENLABS_API_KEY"):
+        st.warning("No ELEVENLABS_API_KEY set — falling back to gTTS.")
     autoplay = st.checkbox("Auto-play replies", value=True)
 
     st.divider()
@@ -104,12 +111,6 @@ with st.sidebar:
     meta = get_session_metadata(session_id)
     persistence_note = "persistent (Upstash)" if meta["persistent"] else "this browser tab only"
     st.caption(f"Memory: {persistence_note} · {meta['message_count']} msgs stored")
-
-if voice_choice == "ElevenLabs (needs key)" and not os.getenv("ELEVENLABS_API_KEY"):
-    st.sidebar.warning("No ELEVENLABS_API_KEY set — falling back to gTTS.")
-elif voice_choice == "Free (gTTS)":
-    # Force gTTS even if an ElevenLabs key exists in secrets
-    os.environ.pop("ELEVENLABS_API_KEY_ACTIVE", None)
 
 # ── Load history from Redis on first run of this session ─────────────────────
 if not st.session_state.messages:
@@ -139,18 +140,21 @@ with col2:
 user_text = None
 detected_lang = "en"
 
-if audio_value is not None and st.session_state.get("_last_audio_id") != id(audio_value):
-    st.session_state["_last_audio_id"] = id(audio_value)
-    with st.spinner("Transcribing..."):
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-            tmp.write(audio_value.read())
-            tmp_path = tmp.name
-        try:
-            user_text, detected_lang = transcribe_audio(tmp_path)
-        except TranscriptionError as e:
-            st.error(f"Transcription failed: {e.message}")
-        finally:
-            os.unlink(tmp_path)
+if audio_value is not None:
+    audio_bytes_raw = audio_value.getvalue()
+    audio_hash = hashlib.sha256(audio_bytes_raw).hexdigest()
+    if audio_hash != st.session_state._last_audio_hash:
+        st.session_state._last_audio_hash = audio_hash
+        with st.spinner("Transcribing..."):
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+                tmp.write(audio_bytes_raw)
+                tmp_path = tmp.name
+            try:
+                user_text, detected_lang = transcribe_audio(tmp_path)
+            except TranscriptionError as e:
+                st.error(f"Transcription failed: {e.message}")
+            finally:
+                os.unlink(tmp_path)
 
 if typed_text:
     user_text = typed_text
@@ -165,11 +169,12 @@ if user_text:
     persona = get_session_persona(session_id)
 
     with st.chat_message("assistant"):
+        assistant_text = None
+        tools_used = None
         with st.spinner("Thinking..."):
             try:
                 assistant_text, _, tools_used = chat_with_memory(user_text, history, persona=persona)
             except Exception as e:
-                assistant_text = None
                 st.error(f"Assistant failed to respond: {e}")
 
         if assistant_text:
@@ -180,8 +185,19 @@ if user_text:
             audio_bytes = None
             with st.spinner("Generating voice..."):
                 try:
-                    audio_bytes = text_to_speech(assistant_text, lang=detected_lang)
+                    audio_bytes = text_to_speech(
+                        assistant_text,
+                        lang=detected_lang,
+                        use_elevenlabs=use_elevenlabs,
+                    )
                     st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
+                except TypeError:
+                    # text_to_speech doesn't accept use_elevenlabs kwarg — fall back
+                    try:
+                        audio_bytes = text_to_speech(assistant_text, lang=detected_lang)
+                        st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
+                    except Exception as e:
+                        st.warning(f"Voice playback failed: {e}")
                 except Exception as e:
                     st.warning(f"Voice playback failed: {e}")
 
