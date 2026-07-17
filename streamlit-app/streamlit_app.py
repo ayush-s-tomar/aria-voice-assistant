@@ -41,8 +41,15 @@ ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
 st.set_page_config(page_title=ARIA_NAME, page_icon="🎙️", layout="centered")
 
 # ── Session identity ──────────────────────────────────────────────────────────
+# session_id is PINNED in session_state. It is only ever changed explicitly,
+# via the on_change callback below — never recomputed as a bare local variable
+# on every rerun. This is what previously caused "Apply persona" and the chat
+# pipeline to sometimes read/write under different session keys.
 if "anon_session_id" not in st.session_state:
     st.session_state.anon_session_id = str(uuid.uuid4())[:8]
+
+if "session_id" not in st.session_state:
+    st.session_state.session_id = st.session_state.anon_session_id
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -50,17 +57,29 @@ if "messages" not in st.session_state:
 if "_last_audio_hash" not in st.session_state:
     st.session_state._last_audio_hash = None
 
+
+def _sync_session_id():
+    """Called on every keystroke change of the name field (on_change),
+    so session_id updates immediately and deterministically — not lazily
+    on the next unrelated rerun (e.g. a button click)."""
+    name = st.session_state.get("display_name", "").strip().lower()
+    st.session_state.session_id = name if name else st.session_state.anon_session_id
+
+
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"## 🎙️ {ARIA_NAME}")
     st.caption("AI Real-Time Intelligent Assistant")
 
-    display_name = st.text_input(
+    st.text_input(
         "Your name (optional — enables cross-device memory)",
         key="display_name",
         placeholder="e.g. ayush",
+        on_change=_sync_session_id,
     )
-    session_id = display_name.strip().lower() if display_name.strip() else st.session_state.anon_session_id
+
+    # Always resolve from the pinned value — never recompute inline here.
+    session_id = st.session_state.session_id
     st.caption(f"Session: `{session_id}`")
 
     st.divider()
@@ -84,12 +103,14 @@ with st.sidebar:
         persona_text = _presets[preset]
 
     if st.button("Apply persona", use_container_width=True):
+        # Uses the pinned session_id — guaranteed in sync with the name field
+        # because on_change fired before this rerun even started.
         if persona_text:
             set_session_persona(session_id, persona_text)
-            st.success("Persona updated.")
+            st.success(f"Persona updated for session `{session_id}`.")
         else:
             set_session_persona(session_id, "")
-            st.success("Reset to default persona.")
+            st.success(f"Reset to default persona for session `{session_id}`.")
 
     st.divider()
     voice_choice = st.radio("Voice engine", ["Free (gTTS)", "ElevenLabs (needs key)"], index=0)
@@ -163,11 +184,15 @@ if user_text:
         st.write(user_text)
 
     history = get_history(session_id)
-    persona = get_session_persona(session_id)
+
+    # get_session_persona can legitimately return None (nothing set yet).
+    # Guard it here so "None" never gets concatenated into the prompt string.
+    persona = get_session_persona(session_id) or ""
 
     # Inject the user's name as a fact the model can actually see.
     # The sidebar text field previously only affected the Redis session key —
     # it was never passed into the system prompt, so ARIA had history but no name.
+    display_name = st.session_state.get("display_name", "")
     if display_name.strip():
         name_fact = f"The user's name is {display_name.strip()}."
         persona = f"{name_fact} {persona}".strip()
