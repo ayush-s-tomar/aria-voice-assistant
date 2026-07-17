@@ -16,8 +16,6 @@ import uuid
 import streamlit as st
 
 # ── Secrets → env (MUST run before importing services.*) ─────────────────────
-# services/llm.py creates its Groq client at import time using os.getenv(),
-# so the env vars need to exist before that import happens, not after.
 for k in [
     "GROQ_API_KEY", "TAVILY_API_KEY", "ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID",
     "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
@@ -42,14 +40,12 @@ ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
 
 st.set_page_config(page_title=ARIA_NAME, page_icon="🎙️", layout="centered")
 
-# ── Session identity (replaces GitHub OAuth) ──────────────────────────────────
-# A typed name gives cross-device persistence in Upstash without OAuth.
-# Leaving it blank just uses a private, per-browser-tab session id.
+# ── Session identity ──────────────────────────────────────────────────────────
 if "anon_session_id" not in st.session_state:
     st.session_state.anon_session_id = str(uuid.uuid4())[:8]
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []  # what's shown on screen this run
+    st.session_state.messages = []
 
 if "_last_audio_hash" not in st.session_state:
     st.session_state._last_audio_hash = None
@@ -106,6 +102,7 @@ with st.sidebar:
     if st.button("🗑️ Clear conversation", use_container_width=True):
         clear_history(session_id)
         st.session_state.messages = []
+        st.session_state._last_audio_hash = None
         st.rerun()
 
     meta = get_session_metadata(session_id)
@@ -168,6 +165,13 @@ if user_text:
     history = get_history(session_id)
     persona = get_session_persona(session_id)
 
+    # Inject the user's name as a fact the model can actually see.
+    # The sidebar text field previously only affected the Redis session key —
+    # it was never passed into the system prompt, so ARIA had history but no name.
+    if display_name.strip():
+        name_fact = f"The user's name is {display_name.strip()}."
+        persona = f"{name_fact} {persona}".strip()
+
     with st.chat_message("assistant"):
         assistant_text = None
         tools_used = None
@@ -192,7 +196,6 @@ if user_text:
                     )
                     st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
                 except TypeError:
-                    # text_to_speech doesn't accept use_elevenlabs kwarg — fall back
                     try:
                         audio_bytes = text_to_speech(assistant_text, lang=detected_lang)
                         st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
