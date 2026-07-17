@@ -40,6 +40,70 @@ ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
 
 st.set_page_config(page_title=ARIA_NAME, page_icon="🎙️", layout="centered")
 
+# ── Visual polish ──────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <style>
+    /* Audio player: default browser controls look washed-out on dark themes.
+       This re-skins the <audio> element to match the app's palette. */
+    audio {
+        width: 100%;
+        height: 40px;
+        border-radius: 10px;
+        background: #1a1c22;
+        filter: invert(1) hue-rotate(180deg);
+        margin-top: 6px;
+    }
+
+    /* Chat bubbles: give user vs assistant messages distinct backgrounds
+       and a bit of breathing room instead of flat, same-toned blocks. */
+    [data-testid="stChatMessage"] {
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        background: linear-gradient(135deg, #2a1414, #241010);
+    }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        background: linear-gradient(135deg, #1c1f2b, #171a24);
+    }
+
+    /* Sidebar: tighten label spacing, add breathing room between sections. */
+    section[data-testid="stSidebar"] {
+        padding-top: 0.5rem;
+    }
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 1rem;
+    }
+    section[data-testid="stSidebar"] hr {
+        margin: 1.1rem 0;
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    section[data-testid="stSidebar"] label p {
+        font-size: 0.85rem;
+        opacity: 0.85;
+    }
+
+    /* Buttons: consistent rounded style instead of Streamlit's flat default. */
+    section[data-testid="stSidebar"] button {
+        border-radius: 8px !important;
+        transition: transform 0.1s ease;
+    }
+    section[data-testid="stSidebar"] button:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Recorder + chat input: round corners so they match the rest of the UI. */
+    [data-testid="stAudioInput"], [data-testid="stChatInput"] {
+        border-radius: 12px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ── Session identity ──────────────────────────────────────────────────────────
 # session_id is PINNED in session_state. It is only ever changed explicitly,
 # via the on_change callback below — never recomputed as a bare local variable
@@ -194,7 +258,15 @@ if user_text:
     # it was never passed into the system prompt, so ARIA had history but no name.
     display_name = st.session_state.get("display_name", "")
     if display_name.strip():
-        name_fact = f"The user's name is {display_name.strip()}."
+        # Phrased as background context with an explicit usage rule —
+        # otherwise LLaMA treats a bare "The user's name is X" fact as an
+        # instruction to open every reply with the name.
+        name_fact = (
+            f"(Background only: the user's name is {display_name.strip()}. "
+            "You may know this, but do not greet them by name or mention "
+            "their name in every reply — only use it when it's naturally "
+            "relevant, e.g. if they ask you to.)"
+        )
         persona = f"{name_fact} {persona}".strip()
 
     with st.chat_message("assistant"):
