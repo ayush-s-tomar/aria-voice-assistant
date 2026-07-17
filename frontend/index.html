@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — AI Real-time Intelligent Assistant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── DARK THEME (default) ── */
+:root,[data-theme="dark"]{
+  --void:#07070D;
+  --s0:#0E0E1A;
+  --s1:#141422;
+  --s2:#1C1C2E;
+  --s3:#242438;
+  --border:rgba(120,100,255,0.12);
+  --border-lit:rgba(120,100,255,0.28);
+  --violet:#7C5CFC;
+  --violet-dim:rgba(124,92,252,0.15);
+  --violet-glow:rgba(124,92,252,0.08);
+  --lilac:#C084FC;
+  --text:#EEEAF8;
+  --text2:#9B93B8;
+  --text3:#5C5478;
+  --green:#34D399;
+  --green-dim:rgba(52,211,153,0.12);
+  --red:#F87171;
+  --amber:#F59E0B;
+  --shadow:rgba(0,0,0,0.4);
+  --font-d:'Space Grotesk',system-ui,sans-serif;
+  --font-b:'Inter',system-ui,sans-serif;
+  --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
+}
+
+/* ── LIGHT THEME ── */
+[data-theme="light"]{
+  --void:#F0EEF8;
+  --s0:#FFFFFF;
+  --s1:#F7F5FF;
+  --s2:#EDE9FA;
+  --s3:#E0DBEF;
+  --border:rgba(100,80,200,0.14);
+  --border-lit:rgba(100,80,200,0.3);
+  --violet:#6344E8;
+  --violet-dim:rgba(99,68,232,0.1);
+  --violet-glow:rgba(99,68,232,0.06);
+  --lilac:#8B5CF6;
+  --text:#1A1630;
+  --text2:#4B4470;
+  --text3:#9490B0;
+  --green:#059669;
+  --green-dim:rgba(5,150,105,0.1);
+  --red:#DC2626;
+  --amber:#D97706;
+  --shadow:rgba(0,0,0,0.1);
+}
+
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background 0.2s,color 0.2s}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HERO BANNER ── */
+.hero-banner{background:var(--s0);border-bottom:1px solid var(--border);padding:18px 28px 14px;text-align:center;flex-shrink:0}
+.hero-banner h1{font-family:var(--font-d);font-size:20px;font-weight:600;color:var(--text);letter-spacing:-0.01em;line-height:1.3}
+.hero-banner h1 span{color:var(--lilac)}
+.hero-banner p{font-size:11.5px;color:var(--text3);margin-top:5px;letter-spacing:0.04em}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:12px;padding:13px 22px;background:var(--s0);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;flex-shrink:0}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon i{font-size:17px;color:#fff}
+.logo-text{font-family:var(--font-d);font-size:16px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.05em;text-transform:uppercase}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lang-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac);display:none;font-weight:500;letter-spacing:0.04em}
+.lang-badge.visible{display:block}
+.icon-btn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s}
+.icon-btn:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border-lit)}
+
+/* ── AUTH ── */
+.auth-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--border-lit);background:var(--violet-dim);color:var(--lilac);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:var(--font-b);text-decoration:none;white-space:nowrap}
+.auth-btn:hover{background:var(--violet);color:#fff;border-color:transparent}
+.auth-btn i{font-size:14px}
+.user-pill{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:20px;background:var(--s2);border:1px solid var(--border);font-size:12px;color:var(--text2)}
+.user-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.user-name{color:var(--text);font-weight:500;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:color 0.15s;display:flex;align-items:center}
+.logout-btn:hover{color:var(--red)}
+
+/* ── LAYOUT ── */
+.main-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 117px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;background:var(--s0)}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
+.sidebar-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:10px 8px 4px;font-weight:500}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:12.5px;color:var(--text2);transition:all 0.15s;border:1px solid transparent;user-select:none}
+.sidebar-item:hover{background:var(--violet-glow);color:var(--text);border-color:var(--border)}
+.sidebar-item.active{background:var(--violet-dim);color:#B8A8FF;border-color:var(--border-lit)}
+.sidebar-item i{font-size:14px;flex-shrink:0;opacity:0.8}
+.sidebar-item.active i{opacity:1}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 2px}
+.session-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);margin-left:auto;flex-shrink:0;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:0.4}}
+.voice-label{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.2);flex-shrink:0}
+.voice-label.off{background:rgba(90,90,120,0.15);color:var(--text3);border-color:var(--border)}
+.model-live{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--violet-dim);color:var(--lilac);border:1px solid var(--border-lit)}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.model-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 13px;margin:0 2px}
+.model-card-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:7px}
+.model-row-inner{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2);padding:3px 0}
+.model-dot{width:5px;height:5px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-right:7px}
+.model-dot.dim{background:var(--text3)}
+.model-name-inner{display:flex;align-items:center}
+.persona-active-badge{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.2);flex-shrink:0}
+
+/* ── CHAT AREA ── */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--s0)}
+.topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.session-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--text2)}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.lang-btn{display:flex;align-items:center;gap:5px;padding:0 10px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;font-size:11.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;font-family:var(--font-b)}
+.lang-btn:hover{background:var(--violet-glow);border-color:var(--border-lit);color:var(--text)}
+.lang-btn i{font-size:13px}
+
+/* ── MESSAGES ── */
+.messages{flex:1;overflow-y:auto;padding:28px 28px 16px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--border-lit);border-radius:4px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;color:var(--text3);padding:40px 20px;text-align:center;min-height:300px}
+.empty-orb{width:68px;height:68px;border-radius:20px;background:var(--violet-dim);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.empty-orb i{font-size:28px;color:var(--violet)}
+.empty-state h3{font-family:var(--font-d);font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty-state p{font-size:13px;line-height:1.65;max-width:290px;color:var(--text2)}
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
+.chip:hover{border-color:var(--border-lit);color:#B8A8FF;background:var(--violet-dim)}
+.date-div{display:flex;align-items:center;gap:12px;margin:18px 0 20px}
+.date-div::before,.date-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.date-div span{font-size:10.5px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase}
+.msg{display:flex;flex-direction:column;gap:0;animation:fadeUp 0.22s ease;margin-bottom:12px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-row{display:flex;align-items:flex-start;gap:10px;max-width:75%}
+.msg.user .msg-row{flex-direction:row-reverse;margin-left:auto}
+.msg.aria .msg-row{margin-right:auto}
+.msg-avatar{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;font-family:var(--font-d);margin-top:2px;overflow:hidden}
+.msg-avatar.av-aria{background:linear-gradient(135deg,var(--violet) 0%,var(--lilac) 100%);color:#fff}
+.msg-avatar.av-user{background:var(--s3);border:1px solid var(--border);color:var(--text2)}
+.msg-avatar img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.msg-content{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.msg-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0 2px}
+.msg.user .msg-meta{justify-content:flex-end}
+.msg-name{color:var(--text2);font-weight:500}
+.msg-name.aria-name{color:#B8A8FF}
+.lang-tag{font-size:10px;padding:1px 7px;border-radius:10px;background:var(--violet-dim);border:1px solid var(--border-lit);color:var(--lilac)}
+.bubble{padding:11px 15px;border-radius:var(--r-md);font-size:13.5px;line-height:1.68;word-break:break-word}
+.msg.user .bubble{background:linear-gradient(135deg,#7C5CFC 0%,#9B7DFF 100%);color:#fff;border-bottom-right-radius:3px}
+.msg.aria .bubble{background:var(--s2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px}
+.bubble-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;margin-top:2px;padding:0 4px}
+.msg:hover .bubble-actions{opacity:1}
+.bubble-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.15s;font-family:var(--font-b)}
+.bubble-btn:hover{background:var(--s3);color:var(--text2);border-color:var(--border-lit)}
+.bubble-btn i{font-size:12px}
+.thinking-bubble{padding:12px 15px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);border-bottom-left-radius:3px;display:flex;align-items:center;gap:10px}
+.thinking-dots{display:flex;gap:4px}
+.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:bounce 1.2s infinite}
+.thinking-dots span:nth-child(2){animation-delay:0.2s}
+.thinking-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+.thinking-label{font-size:12px;color:var(--text3);animation:fdt 2s infinite}
+@keyframes fdt{0%,100%{opacity:0.4}50%{opacity:1}}
+
+/* ── TOOL PILL (shown when ARIA uses a tool) ── */
+.tool-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:3px 10px;border-radius:20px;background:var(--green-dim);border:1px solid rgba(52,211,153,0.2);color:var(--green);margin-bottom:6px;animation:fadeUp 0.2s ease}
+.tool-pill i{font-size:12px}
+
+/* ── WAVEFORM ── */
+.waveform-wrap{display:none;align-items:center;gap:3px;height:24px}
+.waveform-wrap.active{display:flex}
+.waveform-wrap span{width:3px;border-radius:2px;background:var(--violet);animation:wv 1s infinite ease-in-out}
+.waveform-wrap span:nth-child(1){animation-delay:0.0s;height:6px}
+.waveform-wrap span:nth-child(2){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(3){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(4){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(5){animation-delay:0.4s;height:20px}
+.waveform-wrap span:nth-child(6){animation-delay:0.3s;height:14px}
+.waveform-wrap span:nth-child(7){animation-delay:0.2s;height:20px}
+.waveform-wrap span:nth-child(8){animation-delay:0.1s;height:12px}
+.waveform-wrap span:nth-child(9){animation-delay:0.0s;height:6px}
+@keyframes wv{0%,100%{transform:scaleY(0.4);opacity:0.5}50%{transform:scaleY(1);opacity:1}}
+
+/* ── INPUT AREA ── */
+.bottom{border-top:1px solid var(--border);padding:14px 22px 18px;display:flex;flex-direction:column;gap:10px;background:var(--s0);flex-shrink:0}
+.status-row{display:flex;align-items:center;justify-content:center;min-height:28px;gap:8px}
+.status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.status.active{color:var(--lilac)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:sdot 1.5s infinite;display:inline-block;flex-shrink:0}
+@keyframes sdot{0%,100%{opacity:1}50%{opacity:0.2}}
+.input-row{display:flex;align-items:center;gap:8px}
+.text-input-wrap{flex:1;display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-lg);padding:0 8px 0 14px;transition:border-color 0.2s}
+.text-input-wrap:focus-within{border-color:var(--border-lit);background:var(--s1)}
+.text-input-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:13.5px;padding:11px 0;font-family:var(--font-b)}
+.text-input-wrap input::placeholder{color:var(--text3)}
+.attach-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:17px;padding:4px;display:flex;align-items:center;transition:color 0.15s;border-radius:6px}
+.attach-btn:hover{color:var(--text2)}
+.mic-btn{width:42px;height:42px;border-radius:13px;background:var(--violet);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.2s;flex-shrink:0}
+.mic-btn:hover{transform:scale(1.04);box-shadow:0 0 16px rgba(124,92,252,0.45)}
+.mic-btn.recording{background:linear-gradient(135deg,#c0392b,#e74c3c);animation:mpulse 1.5s infinite}
+.mic-btn.wake-active{background:linear-gradient(135deg,#059669,#34D399);animation:mpulse-green 2s infinite}
+@keyframes mpulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.4)}50%{box-shadow:0 0 0 10px rgba(231,76,60,0)}}
+@keyframes mpulse-green{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0.4)}50%{box-shadow:0 0 0 10px rgba(52,211,153,0)}}
+.send-btn{width:38px;height:38px;border-radius:11px;background:transparent;border:1px solid var(--border-lit);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:15px;transition:all 0.15s;flex-shrink:0}
+.send-btn:hover{background:var(--violet-dim)}
+.send-btn.ready{background:var(--violet);border-color:transparent;color:#fff}
+.info-bar{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
+.info-bar span{display:flex;align-items:center;gap:4px}
+.info-bar i{font-size:12px}
+.char-warn{color:var(--amber)!important}
+.kbd{font-size:10px;padding:1px 5px;border-radius:4px;border:1px solid var(--border-lit);color:var(--text3);background:var(--s2);font-family:var(--font-b)}
+
+/* ── MIC PERMISSION ERROR ── */
+.mic-error{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:var(--r-md);background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);margin:8px 0;animation:fadeUp 0.2s ease}
+.mic-error-icon{font-size:18px;color:var(--red);flex-shrink:0;margin-top:1px}
+.mic-error-body{display:flex;flex-direction:column;gap:4px;flex:1}
+.mic-error-title{font-size:13px;font-weight:500;color:var(--red)}
+.mic-error-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.mic-error-steps{font-size:11.5px;color:var(--text3);margin-top:4px;display:flex;flex-direction:column;gap:2px}
+.mic-error-steps span{display:flex;align-items:center;gap:6px}
+.mic-error-steps i{font-size:11px;color:var(--violet);flex-shrink:0}
+.mic-error-dismiss{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;font-family:var(--font-b);white-space:nowrap;align-self:flex-start}
+.mic-error-dismiss:hover{background:var(--s2);color:var(--text2)}
+
+/* ── PERSONA MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn 0.15s ease}
+.modal-overlay.hidden{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--s1);border:1px solid var(--border-lit);border-radius:var(--r-xl);padding:28px;width:100%;max-width:420px;box-shadow:0 24px 60px var(--shadow);animation:slideUp 0.2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-family:var(--font-d);font-size:16px;font-weight:600;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.modal-close{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:2px;border-radius:6px;transition:color 0.15s;display:flex;align-items:center}
+.modal-close:hover{color:var(--text)}
+.persona-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.persona-chip{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none}
+.persona-chip:hover,.persona-chip.active{border-color:var(--border-lit);color:var(--lilac);background:var(--violet-dim)}
+.modal-textarea{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 14px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:90px;outline:none;transition:border-color 0.2s;line-height:1.6}
+.modal-textarea:focus{border-color:var(--border-lit)}
+.modal-textarea::placeholder{color:var(--text3)}
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px}
+.modal-cancel{padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.15s;font-family:var(--font-b)}
+.modal-cancel:hover{background:var(--s2)}
+.modal-save{padding:8px 18px;border-radius:var(--r-sm);border:none;background:var(--violet);color:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:var(--font-b)}
+.modal-save:hover{opacity:0.9;transform:translateY(-1px)}
+.modal-save:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ── PERSONA MODAL ── -->
+<div class="modal-overlay hidden" id="personaModal" onclick="closePersonaModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Customize ARIA's persona</div>
+        <div class="modal-sub">Tell ARIA how to speak in this session</div>
+      </div>
+      <button class="modal-close" onclick="closePersonaModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="persona-chips">
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Be concise and direct. No filler words.')">Concise</div>
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Be friendly, warm, and use casual language.')">Casual</div>
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Be formal and professional in all responses.')">Formal</div>
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Respond like a Socratic tutor — ask questions to guide understanding.')">Tutor</div>
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Be witty and use light humour where appropriate.')">Witty</div>
+      <div class="persona-chip" onclick="selectPersonaPreset(this,'Respond in Hindi when the user speaks Hindi.')">Hindi</div>
+    </div>
+    <textarea class="modal-textarea" id="personaInput" placeholder="Or write your own… e.g. &quot;Speak like a senior engineer. Be terse and technical.&quot;" maxlength="400"></textarea>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closePersonaModal()">Cancel</button>
+      <button class="modal-save" id="personaSaveBtn" onclick="savePersona()">Apply to session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── HERO BANNER ── -->
+<div class="hero-banner">
+  <h1>Ask Anything → Real-Time Reasoning → <span>Spoken Response</span></h1>
+  <p>Voice AI &nbsp;·&nbsp; FastAPI + Groq LLaMA 3.3-70B &nbsp;·&nbsp; Live tool use &nbsp;·&nbsp; Persistent memory &nbsp;·&nbsp; 99 languages</p>
+</div>
+
+<header>
+  <div class="logo-icon"><i class="ti ti-microphone"></i></div>
+  <div>
+    <div class="logo-text">ARIA</div>
+    <div class="logo-sub">AI Real-time Intelligent Assistant</div>
+  </div>
+  <div class="header-right">
+    <div class="lang-badge" id="langBadge">EN</div>
+    <button class="icon-btn" title="Toggle theme" onclick="toggleTheme()" id="themeBtn"><i class="ti ti-sun"></i></button>
+    <button class="icon-btn" title="Export chat" onclick="exportChat()"><i class="ti ti-download"></i></button>
+    <button class="icon-btn" title="Clear chat" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+    <div id="authArea">
+      <a class="auth-btn" href="https://aria-voice-assistant-6eze.onrender.com/auth/login">
+        <i class="ti ti-brand-github"></i> Sign in
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="main-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Session</div>
+    <div class="sidebar-item active">
+      <i class="ti ti-message-circle"></i> Current chat
+      <div class="session-dot"></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Quick actions</div>
+    <div class="sidebar-item" onclick="insertChip('Summarize our conversation so far')">
+      <i class="ti ti-sparkles"></i> Summarize chat
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Translate your last reply to Hindi')">
+      <i class="ti ti-language"></i> Translate reply
+    </div>
+    <div class="sidebar-item" onclick="exportChat()">
+      <i class="ti ti-download"></i> Export chat
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Voice</div>
+    <div class="sidebar-item" onclick="toggleVoiceMode()">
+      <i class="ti ti-volume"></i> Auto-speak
+      <span class="voice-label" id="voiceModeLabel">ON</span>
+    </div>
+    <div class="sidebar-item" onclick="toggleWakeWord()" id="wakeWordBtn">
+      <i class="ti ti-ear-off"></i> Hey ARIA
+      <span class="voice-label off" id="wakeWordLabel">OFF</span>
+    </div>
+    <div class="sidebar-item" onclick="insertChip('What languages can you understand and speak?')">
+      <i class="ti ti-world"></i> 99 languages
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Persona</div>
+    <div class="sidebar-item" onclick="openPersonaModal()" id="personaSidebarItem">
+      <i class="ti ti-adjustments"></i> Customize ARIA
+      <span class="persona-active-badge" id="personaBadge" style="display:none">Active</span>
+    </div>
+    <div class="sidebar-item" onclick="clearPersona()">
+      <i class="ti ti-rotate"></i> Reset persona
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Tools</div>
+    <div class="sidebar-item" onclick="insertChip('Search the web for latest AI news today')">
+      <i class="ti ti-search"></i> Web search
+    </div>
+    <div class="sidebar-item" onclick="insertChip('What is the weather in Mumbai right now?')">
+      <i class="ti ti-cloud"></i> Weather
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Calculate 15% of 8500')">
+      <i class="ti ti-calculator"></i> Calculator
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Convert 100 kilometres to miles')">
+      <i class="ti ti-arrows-exchange"></i> Unit converter
+    </div>
+    <div class="sidebar-item" onclick="insertChip('What day and time is it right now?')">
+      <i class="ti ti-clock"></i> Date & time
+    </div>
+    <div class="sidebar-item" onclick="insertChip('Tell me about the history of the Indian Space Programme')">
+      <i class="ti ti-book"></i> Wikipedia
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-footer">
+      <div class="model-card">
+        <div class="model-card-lbl">Active models</div>
+        <div class="model-row-inner">
+          <div class="model-name-inner"><div class="model-dot"></div>LLaMA 3.3-70B</div>
+          <span class="model-live">Live</span>
+        </div>
+        <div class="model-row-inner" style="margin-top:5px">
+          <div class="model-name-inner"><div class="model-dot dim"></div>Groq Whisper</div>
+        </div>
+        <div class="model-row-inner" style="margin-top:5px">
+          <div class="model-name-inner"><div class="model-dot dim"></div>Tavily Search</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="topbar">
+      <div class="session-pill" id="sessionPill">
+        <div class="s-dot"></div>
+        Anonymous session
+      </div>
+      <div class="topbar-right">
+        <button class="lang-btn" id="topLangBtn">
+          <i class="ti ti-world"></i> EN
+        </button>
+        <button class="icon-btn" title="Refresh" onclick="clearChat()"><i class="ti ti-refresh"></i></button>
+        <button class="icon-btn" title="Export" onclick="exportChat()"><i class="ti ti-download"></i></button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-orb"><i class="ti ti-microphone"></i></div>
+        <h3>Start a conversation</h3>
+        <p>Tap the mic to speak, or say <strong style="color:var(--lilac)">"Hey ARIA"</strong> to go hands-free.<br>ARIA understands 99 languages automatically.</p>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+          <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+          <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+          <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+          <div class="chip" onclick="insertChip('Search the web for latest AI news')">Latest AI news</div>
+          <div class="chip" onclick="insertChip('Calculate 20% of 5000')">Quick calculate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="status-row">
+        <div class="waveform-wrap" id="waveform">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="status" id="status">
+          <i class="ti ti-microphone"></i> Tap mic to speak &nbsp;<span class="kbd">Space</span>
+        </div>
+      </div>
+      <div id="micErrorBanner" style="display:none"></div>
+      <div class="input-row">
+        <div class="text-input-wrap">
+          <button class="attach-btn" title="Attach (coming soon)" onclick="alert('File upload coming soon!')">
+            <i class="ti ti-paperclip"></i>
+          </button>
+          <input type="text" id="textInput"
+            placeholder="Message ARIA… (Enter to send)"
+            maxlength="500"
+            oninput="onInput()"
+            onkeydown="handleKey(event)" />
+        </div>
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Record voice (Space)">
+          <i class="ti ti-microphone" id="micIcon"></i>
+        </button>
+        <button class="send-btn" id="sendBtn" onclick="sendText()" title="Send (Enter)">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+      <div class="info-bar">
+        <span><i class="ti ti-lock"></i> Private · Persistent memory</span>
+        <span id="charCount"></span>
+        <span id="msgCount">0 messages</span>
+        <span><i class="ti ti-server"></i> Render · Groq · Upstash</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://aria-voice-assistant-6eze.onrender.com";
+const WS_API = "wss://aria-voice-assistant-6eze.onrender.com";
+setInterval(() => fetch(`${API}/docs`).catch(()=>{}), 840000);
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+let currentTheme = localStorage.getItem('aria_theme') || 'dark';
+applyTheme(currentTheme);
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.innerHTML = theme === 'dark' ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
+  localStorage.setItem('aria_theme', theme);
+}
+function toggleTheme() { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(currentTheme); }
+
+// ── Time helper (always uppercase AM/PM) ──────────────────────────────────────
+function fmtTime() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    .replace('am', 'AM').replace('pm', 'PM');
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+let authToken = localStorage.getItem('aria_token');
+let currentUser = null;
+
+async function initAuth() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) { authToken = token; localStorage.setItem('aria_token', token); window.history.replaceState({}, '', window.location.pathname); }
+  if (params.get('error')) window.history.replaceState({}, '', window.location.pathname);
+  if (authToken) {
+    try {
+      const res = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${authToken}` } });
+      if (res.ok) { currentUser = await res.json(); renderUserPill(currentUser); updateSessionPill(); }
+      else logout(false);
+    } catch(e) { console.warn("Auth check failed:", e); }
+  }
+}
+
+function renderUserPill(user) {
+  document.getElementById('authArea').innerHTML = `
+    <div class="user-pill">
+      <img class="user-avatar" src="${user.avatar}" alt="${user.name}" onerror="this.style.display='none'">
+      <span class="user-name">${user.name}</span>
+      <button class="logout-btn" onclick="logout(true)" title="Sign out"><i class="ti ti-logout"></i></button>
+    </div>`;
+}
+
+function updateSessionPill() {
+  document.getElementById('sessionPill').innerHTML = currentUser
+    ? `<div class="s-dot"></div> ${currentUser.username}'s session`
+    : `<div class="s-dot"></div> Anonymous session`;
+}
+
+function logout(clearHistory = true) {
+  authToken = null; currentUser = null;
+  localStorage.removeItem('aria_token');
+  document.getElementById('authArea').innerHTML = `<a class="auth-btn" href="${API}/auth/login"><i class="ti ti-brand-github"></i> Sign in</a>`;
+  updateSessionPill();
+  if (clearHistory) clearChat();
+}
+
+function getAuthHeaders() { return authToken ? { Authorization: `Bearer ${authToken}` } : {}; }
+
+// ── Session ───────────────────────────────────────────────────────────────────
+let sessionId = localStorage.getItem('aria_session_id');
+if (!sessionId) { sessionId = "session_" + Math.random().toString(36).slice(2, 10); localStorage.setItem('aria_session_id', sessionId); }
+
+async function initSession() {
+  try {
+    const res = await fetch(`${API}/session/${sessionId}`, { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.message_count > 0) document.getElementById('msgCount').textContent = data.message_count + ' message' + (data.message_count !== 1 ? 's' : '') + ' (restored)';
+      if (data.persona) document.getElementById('personaBadge').style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+let mediaRecorder = null, audioChunks = [], recording = false;
+let msgCount = 0, autoSpeak = true;
+let ws = null, wsReady = false;
+let currentAriaMsg = null;
+let audioQueue = [], isPlaying = false;
+
+// ── Mic error ─────────────────────────────────────────────────────────────────
+function showMicError(errorType) {
+  const isSystem = errorType === 'NotAllowedError' || errorType === 'PermissionDeniedError';
+  const banner = document.getElementById('micErrorBanner');
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="mic-error">
+      <i class="ti ti-microphone-off mic-error-icon"></i>
+      <div class="mic-error-body">
+        <div class="mic-error-title">${isSystem ? 'Microphone access blocked' : 'Microphone not found'}</div>
+        <div class="mic-error-desc">${isSystem ? 'ARIA needs mic access to hear you. Your browser has blocked it.' : 'No microphone detected. Connect one or use text input below.'}</div>
+        ${isSystem ? `<div class="mic-error-steps">
+          <span><i class="ti ti-click"></i> Click the lock icon in your browser's address bar</span>
+          <span><i class="ti ti-adjustments"></i> Set Microphone to "Allow"</span>
+          <span><i class="ti ti-refresh"></i> Refresh this page</span>
+        </div>` : ''}
+      </div>
+      <button class="mic-error-dismiss" onclick="dismissMicError()">Dismiss</button>
+    </div>`;
+}
+function dismissMicError() { const b = document.getElementById('micErrorBanner'); b.style.display = 'none'; b.innerHTML = ''; }
+
+// ── Persona ───────────────────────────────────────────────────────────────────
+function openPersonaModal() { document.getElementById('personaModal').classList.remove('hidden'); document.getElementById('personaInput').focus(); }
+function closePersonaModal(e) { if (e && e.target !== document.getElementById('personaModal')) return; document.getElementById('personaModal').classList.add('hidden'); }
+function selectPersonaPreset(el, text) {
+  document.querySelectorAll('.persona-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('personaInput').value = text;
+}
+async function savePersona() {
+  const persona = document.getElementById('personaInput').value.trim();
+  if (!persona) return;
+  const btn = document.getElementById('personaSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await fetch(`${API}/session/${sessionId}/persona`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body: JSON.stringify({ persona }) });
+    if (res.ok) {
+      document.getElementById('personaBadge').style.display = 'block';
+      document.getElementById('personaModal').classList.add('hidden');
+      setStatus('Persona updated — ARIA will respond differently now'); setTimeout(() => setStatus(idleStatus()), 3000);
+    } else { btn.textContent = 'Error — try again'; setTimeout(() => { btn.disabled = false; btn.textContent = 'Apply to session'; }, 2000); }
+  } catch(e) { btn.textContent = 'Error — try again'; setTimeout(() => { btn.disabled = false; btn.textContent = 'Apply to session'; }, 2000); }
+}
+async function clearPersona() {
+  try { await fetch(`${API}/session/${sessionId}/persona`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, body: JSON.stringify({ persona: '' }) }); } catch(e) {}
+  document.getElementById('personaBadge').style.display = 'none';
+  document.getElementById('personaInput').value = '';
+  document.querySelectorAll('.persona-chip').forEach(c => c.classList.remove('active'));
+  setStatus('Persona reset — ARIA is back to default'); setTimeout(() => setStatus(idleStatus()), 2500);
+}
+
+// ── Wake Word ─────────────────────────────────────────────────────────────────
+let wakeRecognition = null, wakeWordEnabled = false;
+
+function startWakeWord() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { alert("Wake word requires Chrome browser."); return; }
+  wakeRecognition = new SpeechRecognition();
+  wakeRecognition.continuous = true; wakeRecognition.interimResults = true; wakeRecognition.lang = "en-US";
+  wakeRecognition.onresult = (event) => {
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript.toLowerCase().trim();
+      if (["hey aria","hey area","hey arya","ok aria","hi aria"].some(w => t.includes(w))) {
+        if (!recording && !isPlaying) { wakeRecognition.stop(); setStatus('👂 "Hey ARIA" detected — listening…', true); setWaveform(true); setTimeout(() => toggleRecording(), 300); }
+      }
+    }
+  };
+  wakeRecognition.onend = () => { if (wakeWordEnabled && !recording) setTimeout(() => { try { wakeRecognition.start(); } catch(e) {} }, 500); };
+  wakeRecognition.onerror = (e) => { if (e.error !== "no-speech" && e.error !== "aborted") console.warn("Wake word error:", e.error); };
+  try { wakeRecognition.start(); } catch(e) {}
+}
+function stopWakeWord() { if (wakeRecognition) try { wakeRecognition.stop(); } catch(e) {} }
+function toggleWakeWord() {
+  wakeWordEnabled = !wakeWordEnabled;
+  const btn = document.getElementById("wakeWordBtn");
+  if (wakeWordEnabled) {
+    startWakeWord();
+    btn.innerHTML = '<i class="ti ti-ear"></i> Hey ARIA <span class="voice-label" id="wakeWordLabel">ON</span>';
+    document.getElementById("micBtn").classList.add("wake-active");
+    setStatus('👂 Listening for "Hey ARIA"…');
+  } else {
+    stopWakeWord();
+    btn.innerHTML = '<i class="ti ti-ear-off"></i> Hey ARIA <span class="voice-label off" id="wakeWordLabel">OFF</span>';
+    document.getElementById("micBtn").classList.remove("wake-active");
+    setStatus('Tap mic to speak &nbsp;<span class="kbd">Space</span>');
+  }
+}
+function resumeWakeWord() {
+  if (wakeWordEnabled && !recording) {
+    setTimeout(() => { try { wakeRecognition.start(); } catch(e) {} setStatus('👂 Listening for "Hey ARIA"…'); document.getElementById("micBtn").classList.add("wake-active"); }, 1000);
+  }
+}
+function idleStatus() { return wakeWordEnabled ? '👂 Listening for "Hey ARIA"…' : 'Tap mic to speak &nbsp;<span class="kbd">Space</span>'; }
+
+// ── Tool icon map ─────────────────────────────────────────────────────────────
+const TOOL_ICONS = {
+  'web search': 'ti-search', 'web_search': 'ti-search',
+  'calculator': 'ti-calculator',
+  'get weather': 'ti-cloud', 'get_weather': 'ti-cloud',
+  'wikipedia': 'ti-book',
+  'get datetime': 'ti-clock', 'get_datetime': 'ti-clock',
+  'unit converter': 'ti-arrows-exchange', 'unit_converter': 'ti-arrows-exchange',
+};
+function toolIcon(label) {
+  const key = label.toLowerCase().trim();
+  for (const [k, v] of Object.entries(TOOL_ICONS)) { if (key.includes(k)) return v; }
+  return 'ti-sparkles';
+}
+
+// ── WebSocket ─────────────────────────────────────────────────────────────────
+function connectWebSocket() {
+  ws = new WebSocket(`${WS_API}/ws/${sessionId}`);
+  ws.onopen = () => { wsReady = true; if (authToken) ws.send(JSON.stringify({ type: "auth", token: authToken })); setStatus(idleStatus()); };
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === "auth_ok") return;
+    else if (msg.type === "status") setStatus(msg.text, true);
+    else if (msg.type === "transcript") {
+      addMsg("user", msg.text, msg.lang);
+      if (msg.lang) setLang(msg.lang);
+      currentAriaMsg = addStreamingMsg();
+    } else if (msg.type === "token") {
+      if (!currentAriaMsg) return;
+      const isToolStatus = msg.text.startsWith("\n[") && msg.text.includes("…]");
+      if (isToolStatus) {
+        // Render as a visible pill, not raw text
+        const label = msg.text.replace(/\n\[Using (.+?)…\]\n/, '$1');
+        const content = currentAriaMsg.querySelector(".msg-content");
+        const pill = document.createElement("div");
+        pill.className = "tool-pill";
+        pill.innerHTML = `<i class="ti ${toolIcon(label)}"></i> Using ${label}`;
+        content.insertBefore(pill, content.querySelector(".bubble"));
+      } else {
+        appendToken(currentAriaMsg, msg.text);
+      }
+    } else if (msg.type === "audio_chunk") {
+      if (autoSpeak) {
+        const bytes = Uint8Array.from(atob(msg.data), c => c.charCodeAt(0));
+        audioQueue.push(URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" })));
+        if (!isPlaying) playNextChunk();
+      }
+    } else if (msg.type === "done") {
+      if (currentAriaMsg) finalizeMsg(currentAriaMsg, msg.text);
+      currentAriaMsg = null;
+      msgCount++;
+      document.getElementById("msgCount").textContent = msgCount + " message" + (msgCount !== 1 ? "s" : "");
+      resumeWakeWord(); setStatus(idleStatus());
+    } else if (msg.type === "error") {
+      if (currentAriaMsg) currentAriaMsg.remove();
+      addMsg("aria", "Error: " + msg.text);
+      resumeWakeWord(); setStatus("Error");
+    }
+  };
+  ws.onclose = () => { wsReady = false; setTimeout(connectWebSocket, 2000); };
+  ws.onerror = () => ws.close();
+}
+
+function playNextChunk() {
+  if (audioQueue.length === 0) { isPlaying = false; return; }
+  isPlaying = true;
+  const audio = new Audio(audioQueue.shift());
+  audio.onended = () => playNextChunk();
+  audio.play();
+}
+
+// ── Streaming bubble helpers ──────────────────────────────────────────────────
+function addStreamingMsg() {
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "msg aria";
+  d.innerHTML = `
+    <div class="msg-row">
+      <div class="msg-avatar av-aria">AR</div>
+      <div class="msg-content">
+        <div class="msg-meta"><span class="msg-name aria-name">ARIA</span><span>${fmtTime()}</span></div>
+        <div class="bubble stream-bubble"></div>
+      </div>
+    </div>`;
+  document.getElementById("messages").appendChild(d);
+  d.scrollIntoView({ behavior: "smooth" });
+  return d;
+}
+
+function appendToken(msgEl, token) {
+  msgEl.querySelector(".bubble").textContent += token;
+  msgEl.scrollIntoView({ behavior: "smooth" });
+}
+
+function finalizeMsg(msgEl, fullText) {
+  msgEl.querySelector(".bubble").innerHTML = fullText;
+  msgEl.querySelector(".msg-content").insertAdjacentHTML("beforeend", `
+    <div class="bubble-actions">
+      <button class="bubble-btn" onclick="copyText(this)"><i class="ti ti-copy"></i> Copy</button>
+      <button class="bubble-btn" onclick="speakText(this)"><i class="ti ti-volume"></i> Speak</button>
+    </div>`);
+}
+
+// ── Recording ─────────────────────────────────────────────────────────────────
+document.addEventListener("keydown", e => { if (e.code === "Space" && document.activeElement !== document.getElementById("textInput")) { e.preventDefault(); toggleRecording(); } });
+function handleKey(e) { if (e.key === "Enter" && !e.shiftKey) sendText(); }
+
+function setStatus(html, active = false) {
+  const s = document.getElementById("status");
+  s.innerHTML = (active ? '<span class="status-dot"></span> ' : '<i class="ti ti-microphone"></i> ') + html;
+  s.className = "status" + (active ? " active" : "");
+}
+
+function onInput() {
+  const v = document.getElementById("textInput").value;
+  document.getElementById("sendBtn").className = "send-btn" + (v.trim() ? " ready" : "");
+  const cc = document.getElementById("charCount");
+  if (v.length > 0) { cc.textContent = v.length + "/500"; cc.className = v.length > 400 ? "char-warn" : ""; }
+  else cc.textContent = "";
+}
+
+function clearEmpty() { document.getElementById("emptyState")?.remove(); }
+
+function addDateDivider() {
+  const d = document.createElement("div");
+  d.className = "date-div";
+  d.innerHTML = `<span>Today · ${fmtTime()}</span>`;
+  document.getElementById("messages").appendChild(d);
+}
+
+function addMsg(role, text, lang = null) {
+  if (msgCount === 0) addDateDivider();
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "msg " + role;
+  const langTag = lang ? `<span class="lang-tag"><i class="ti ti-language"></i> ${lang.slice(0,2).toUpperCase()}</span>` : "";
+  const isUser = role === "user";
+  const avatarContent = isUser
+    ? (currentUser ? `<img src="${currentUser.avatar}" alt="${currentUser.name}" onerror="this.parentElement.textContent='Y'">` : "Y")
+    : "AR";
+  const nameHtml = isUser ? '<span class="msg-name">You</span>' : '<span class="msg-name aria-name">ARIA</span>';
+  const actions = !isUser ? `
+    <div class="bubble-actions">
+      <button class="bubble-btn" onclick="copyText(this)"><i class="ti ti-copy"></i> Copy</button>
+      <button class="bubble-btn" onclick="speakText(this)"><i class="ti ti-volume"></i> Speak</button>
+    </div>` : "";
+  d.innerHTML = `
+    <div class="msg-row">
+      <div class="msg-avatar ${isUser ? 'av-user' : 'av-aria'}">${avatarContent}</div>
+      <div class="msg-content">
+        <div class="msg-meta">${nameHtml}<span>${fmtTime()}</span>${langTag}</div>
+        <div class="bubble">${text}</div>${actions}
+      </div>
+    </div>`;
+  document.getElementById("messages").appendChild(d);
+  d.scrollIntoView({ behavior: "smooth" });
+  if (role !== "aria") { msgCount++; document.getElementById("msgCount").textContent = msgCount + " message" + (msgCount !== 1 ? "s" : ""); }
+  return d;
+}
+
+async function toggleRecording() {
+  if (!recording) {
+    try {
+      if (wakeWordEnabled) { try { wakeRecognition.stop(); } catch(e) {} document.getElementById("micBtn").classList.remove("wake-active"); }
+      dismissMicError();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        setWaveform(false);
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
+        if (wsReady) { setStatus("Sending audio…", true); ws.send(await blob.arrayBuffer()); }
+        else { await sendAudioHTTP(blob); }
+      };
+      mediaRecorder.start(); recording = true;
+      document.getElementById("micBtn").className = "mic-btn recording";
+      document.getElementById("micIcon").className = "ti ti-player-stop";
+      setWaveform(true);
+      setStatus('Listening… tap again to stop &nbsp;<span class="kbd">Space</span>', true);
+    } catch(e) { showMicError(e.name); setStatus("Mic unavailable — use text input below"); }
+  } else {
+    mediaRecorder.stop(); recording = false;
+    document.getElementById("micBtn").className = "mic-btn";
+    document.getElementById("micIcon").className = "ti ti-microphone";
+    setStatus("Processing…", true);
+  }
+}
+
+async function sendAudioHTTP(blob) {
+  const fd = new FormData();
+  fd.append("audio", blob, "recording.webm");
+  const thinking = addThinking();
+  try {
+    const res = await fetch(`${API}/chat/voice?session_id=${sessionId}`, { method: "POST", headers: getAuthHeaders(), body: fd });
+    if (!res.ok) throw new Error();
+    const userText = atob(res.headers.get("X-User-Text") || "") || "…";
+    const assistantText = atob(res.headers.get("X-Assistant-Text") || "") || "…";
+    const lang = res.headers.get("X-Language");
+    thinking.remove();
+    addMsg("user", userText, lang);
+    addMsg("aria", assistantText);
+    if (lang) setLang(lang);
+    if (autoSpeak) {
+      const audioBlob = await res.blob();
+      const audio = new Audio(URL.createObjectURL(audioBlob));
+      setStatus('<i class="ti ti-volume"></i> ARIA is speaking…', true);
+      audio.onended = () => { resumeWakeWord(); setStatus(idleStatus()); };
+      audio.play();
+    } else { resumeWakeWord(); setStatus(idleStatus()); }
+  } catch(e) { thinking.remove(); addMsg("aria", "Connection error — is the backend running?"); setStatus("Error connecting to backend"); }
+}
+
+function addThinking() {
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "msg aria";
+  d.innerHTML = `
+    <div class="msg-row">
+      <div class="msg-avatar av-aria">AR</div>
+      <div class="msg-content">
+        <div class="msg-meta"><span class="msg-name aria-name">ARIA</span></div>
+        <div class="thinking-bubble">
+          <div class="thinking-dots"><span></span><span></span><span></span></div>
+          <span class="thinking-label">ARIA is thinking…</span>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("messages").appendChild(d);
+  d.scrollIntoView({ behavior: "smooth" });
+  return d;
+}
+
+async function sendText() {
+  const input = document.getElementById("textInput");
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ""; onInput();
+  addMsg("user", text);
+  const thinking = addThinking();
+  setStatus("Processing…", true);
+  try {
+    const res = await fetch(`${API}/chat/text?session_id=${sessionId}`, { method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify({ message: text }) });
+    const data = await res.json();
+    thinking.remove();
+    addMsg("aria", data.assistant);
+    setStatus(idleStatus());
+  } catch(e) { thinking.remove(); addMsg("aria", "Connection error."); setStatus("Error"); }
+}
+
+function setLang(lang) {
+  if (!lang) return;
+  const code = lang.slice(0,2).toUpperCase();
+  const b = document.getElementById("langBadge");
+  b.textContent = code; b.className = "lang-badge visible";
+  document.getElementById("topLangBtn").innerHTML = `<i class="ti ti-world"></i> ${code}`;
+}
+
+function setWaveform(active) { document.getElementById("waveform").className = "waveform-wrap" + (active ? " active" : ""); }
+
+function insertChip(text) { document.getElementById("textInput").value = text; onInput(); document.getElementById("textInput").focus(); }
+
+function copyText(btn) {
+  const text = btn.closest(".msg").querySelector(".bubble").textContent.trim();
+  navigator.clipboard.writeText(text).then(() => { btn.innerHTML = '<i class="ti ti-check"></i> Copied'; setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy"></i> Copy'; }, 1500); });
+}
+
+function speakText(btn) {
+  const text = btn.closest(".msg").querySelector(".bubble").textContent.trim();
+  speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+const emptyHTML = `
+  <div class="empty-state" id="emptyState">
+    <div class="empty-orb"><i class="ti ti-microphone"></i></div>
+    <h3>Start a conversation</h3>
+    <p>Tap the mic to speak, or say <strong style="color:var(--lilac)">"Hey ARIA"</strong> to go hands-free.<br>ARIA understands 99 languages automatically.</p>
+    <div class="suggestion-chips">
+      <div class="chip" onclick="insertChip('What can you help me with?')">What can you help me with?</div>
+      <div class="chip" onclick="insertChip('Tell me something interesting')">Tell me something interesting</div>
+      <div class="chip" onclick="insertChip('नमस्ते ARIA, आप कैसे हैं?')">नमस्ते ARIA</div>
+      <div class="chip" onclick="insertChip('Introduce yourself')">Introduce yourself</div>
+      <div class="chip" onclick="insertChip('Search the web for latest AI news')">Latest AI news</div>
+      <div class="chip" onclick="insertChip('Calculate 20% of 5000')">Quick calculate</div>
+    </div>
+  </div>`;
+
+function clearChat() {
+  fetch(`${API}/session/${sessionId}`, { method: "DELETE", headers: getAuthHeaders() }).catch(() => {});
+  document.getElementById("messages").innerHTML = emptyHTML;
+  msgCount = 0;
+  document.getElementById("msgCount").textContent = "0 messages";
+  document.getElementById("charCount").textContent = "";
+  document.getElementById("langBadge").className = "lang-badge";
+  document.getElementById('personaBadge').style.display = 'none';
+  dismissMicError();
+  setWaveform(false);
+  setStatus(idleStatus());
+}
+
+function toggleVoiceMode() {
+  autoSpeak = !autoSpeak;
+  const lbl = document.getElementById("voiceModeLabel");
+  lbl.textContent = autoSpeak ? "ON" : "OFF";
+  lbl.className = "voice-label" + (autoSpeak ? "" : " off");
+}
+
+function exportChat() {
+  const msgs = [...document.querySelectorAll(".msg")];
+  if (!msgs.length) { alert("No messages to export yet."); return; }
+  const lines = msgs.map(m => {
+    const role = m.classList.contains("user") ? (currentUser ? currentUser.name : "You") : "ARIA";
+    return `[${m.querySelector(".msg-meta")?.textContent?.trim() || ""}]\n${role}: ${m.querySelector(".bubble")?.textContent?.trim() || ""}`;
+  });
+  const blob = new Blob(["ARIA Chat Export\n" + new Date().toLocaleString() + "\nSession: " + sessionId + (currentUser ? `\nUser: ${currentUser.name} (@${currentUser.username})` : "") + "\n\n" + lines.join("\n\n")], { type: "text/plain" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "aria-chat-" + Date.now() + ".txt"; a.click();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+initAuth().then(() => { initSession(); connectWebSocket(); });
+</script>
+</body>
+</html>

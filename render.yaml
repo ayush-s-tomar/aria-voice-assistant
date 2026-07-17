@@ -1,0 +1,59 @@
+services:
+  - type: web
+    name: aria-voice-assistant
+    env: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+      # ── Groq (required) ───────────────────────────────────────────────────
+      - key: GROQ_API_KEY
+        sync: false
+
+      # ── Upstash Redis (required — persistent session memory) ──────────────
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+
+      # ── Session config ────────────────────────────────────────────────────
+      - key: SESSION_TTL_HOURS
+        value: "24"
+      - key: ARIA_MAX_HISTORY
+        value: "20"
+
+      # ── GitHub OAuth (optional — enables login) ───────────────────────────
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: "https://ayush-s-tomar.github.io/aria-voice-assistant"
+
+      # ── ElevenLabs TTS (optional — premium voice) ─────────────────────────
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        value: "21m00Tcm4TlvDq8ikWAM"
+
+      # ── Persona (optional — rebrand or add instructions globally) ─────────
+      - key: ARIA_NAME
+        value: "ARIA"
+      - key: ARIA_PERSONA_EXTRA
+        value: ""
+
+      # ── TTS cache size (in-memory, resets on redeploy) ────────────────────
+      - key: TTS_CACHE_SIZE
+        value: "200"
+
+      # ── Tavily (required for web search tool) ─────────────────────────────
+      - key: TAVILY_API_KEY
+        sync: false
