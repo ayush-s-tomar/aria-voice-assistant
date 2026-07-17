@@ -19,8 +19,6 @@ from datetime import datetime, timezone
 
 import requests
 
-# ── Tool definitions (OpenAI function-calling format) ─────────────────────────
-
 TOOLS = [
     {
         "type": "function",
@@ -123,8 +121,6 @@ TOOLS = [
 ]
 
 
-# ── Tool implementations ───────────────────────────────────────────────────────
-
 def _web_search(query: str) -> str:
     api_key = os.getenv("TAVILY_API_KEY")
     if not api_key:
@@ -146,8 +142,6 @@ def _web_search(query: str) -> str:
 
 
 def _calculator(expression: str) -> str:
-    """Safe math evaluator — no eval(), uses AST."""
-    # Normalise percentage syntax: "15% of 8500" → "0.15 * 8500"
     expression = re.sub(r"(\d+(?:\.\d+)?)\s*%\s*of\s*(\d+(?:\.\d+)?)",
                         r"(\1/100)*\2", expression, flags=re.IGNORECASE)
     expression = expression.replace("%", "/100")
@@ -193,7 +187,6 @@ def _calculator(expression: str) -> str:
 
 
 def _get_weather(location: str) -> str:
-    """Live weather from wttr.in — free, no API key."""
     try:
         res = requests.get(
             f"https://wttr.in/{requests.utils.quote(location)}?format=j1",
@@ -225,7 +218,6 @@ def _get_weather(location: str) -> str:
 
 
 def _wikipedia(topic: str) -> str:
-    """Wikipedia article summary via the public REST API."""
     try:
         res = requests.get(
             f"https://en.wikipedia.org/api/rest_v1/page/summary/{requests.utils.quote(topic)}",
@@ -233,7 +225,6 @@ def _wikipedia(topic: str) -> str:
             headers={"User-Agent": "ARIA-VoiceAssistant/3.0"},
         )
         if res.status_code == 404:
-            # Try search as fallback
             search = requests.get(
                 "https://en.wikipedia.org/w/api.php",
                 params={"action": "opensearch", "search": topic, "limit": 1, "format": "json"},
@@ -246,7 +237,6 @@ def _wikipedia(topic: str) -> str:
         data = res.json()
         extract = data.get("extract", "")
         title = data.get("title", topic)
-        # Trim to ~400 chars for voice — concise enough to speak
         if len(extract) > 400:
             extract = extract[:400].rsplit(".", 1)[0] + "."
         return f"{title}: {extract}"
@@ -255,7 +245,6 @@ def _wikipedia(topic: str) -> str:
 
 
 def _get_datetime(timezone_name: str = "UTC") -> str:
-    """Current date and time. Uses pytz if available, falls back to UTC."""
     try:
         import pytz
         tz = pytz.timezone(timezone_name)
@@ -271,9 +260,7 @@ def _get_datetime(timezone_name: str = "UTC") -> str:
     )
 
 
-# Conversion factors — all relative to a base SI unit per category
-_CONVERSIONS: dict[str, dict[str, float]] = {
-    # Length — base: metres
+_CONVERSIONS: dict[str, float] = {
     "m": 1, "metres": 1, "meter": 1, "meters": 1,
     "km": 1000, "kilometres": 1000, "kilometers": 1000,
     "cm": 0.01, "centimetres": 0.01, "centimeters": 0.01,
@@ -282,26 +269,22 @@ _CONVERSIONS: dict[str, dict[str, float]] = {
     "yards": 0.9144, "yard": 0.9144, "yd": 0.9144,
     "feet": 0.3048, "foot": 0.3048, "ft": 0.3048,
     "inches": 0.0254, "inch": 0.0254, "in": 0.0254,
-    # Weight — base: kilograms
     "kg": 1, "kilograms": 1, "kilogram": 1,
     "g": 0.001, "grams": 0.001, "gram": 0.001,
     "mg": 0.000001, "milligrams": 0.000001,
     "lbs": 0.453592, "lb": 0.453592, "pounds": 0.453592, "pound": 0.453592,
     "oz": 0.0283495, "ounces": 0.0283495, "ounce": 0.0283495,
     "tonnes": 1000, "tonne": 1000, "ton": 907.185, "tons": 907.185,
-    # Speed — base: m/s
     "m/s": 1, "ms": 1,
     "km/h": 0.277778, "kmh": 0.277778, "kph": 0.277778,
     "mph": 0.44704,
     "knots": 0.514444, "knot": 0.514444,
-    # Volume — base: litres
     "l": 1, "litre": 1, "litres": 1, "liter": 1, "liters": 1,
     "ml": 0.001, "millilitre": 0.001, "millilitres": 0.001,
     "gallon": 3.78541, "gallons": 3.78541,
     "pint": 0.473176, "pints": 0.473176,
     "cup": 0.236588, "cups": 0.236588,
     "fl oz": 0.0295735, "floz": 0.0295735,
-    # Area — base: m²
     "m2": 1, "sqm": 1,
     "km2": 1e6, "sqkm": 1e6,
     "cm2": 0.0001, "sqcm": 0.0001,
@@ -315,19 +298,16 @@ def _unit_converter(value: float, from_unit: str, to_unit: str) -> str:
     f = from_unit.lower().strip()
     t = to_unit.lower().strip()
 
-    # Temperature — special case (not multiplicative)
     temp_aliases = {"celsius": "c", "centigrade": "c", "fahrenheit": "f", "kelvin": "k"}
     f = temp_aliases.get(f, f)
     t = temp_aliases.get(t, t)
 
     if f in ("c", "f", "k") or t in ("c", "f", "k"):
-        # Convert from → Celsius first
         if f == "c":   c = value
         elif f == "f": c = (value - 32) * 5 / 9
         elif f == "k": c = value - 273.15
         else:
             return f"Unknown temperature unit '{from_unit}'."
-        # Convert Celsius → to
         if t == "c":   result = c
         elif t == "f": result = c * 9 / 5 + 32
         elif t == "k": result = c + 273.15
@@ -340,16 +320,12 @@ def _unit_converter(value: float, from_unit: str, to_unit: str) -> str:
     if t not in _CONVERSIONS:
         return f"Unknown unit '{to_unit}'."
 
-    # Check same category (rough: same order of magnitude base)
     base_value = value * _CONVERSIONS[f]
     result = base_value / _CONVERSIONS[t]
     return f"{value} {from_unit} = {round(result, 6)} {to_unit}"
 
 
-# ── Dispatcher ────────────────────────────────────────────────────────────────
-
 def run_tool(name: str, args: dict) -> str:
-    """Dispatch a tool call by name and return the string result."""
     try:
         if name == "web_search":
             return _web_search(args["query"])
