@@ -1,14 +1,14 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect, Header
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, RedirectResponse, JSONResponse
-import tempfile, os, io, base64, json
-from services.transcriber import transcribe_audio
-from services.llm import chat_with_memory, stream_llm_response
-from services.tts import text_to_speech
-from services.memory import (
+from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect, Header  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.responses import StreamingResponse, RedirectResponse  # noqa: E402
+import tempfile, os, io, base64  # noqa: E402, E401
+from services.transcriber import transcribe_audio  # noqa: E402
+from services.llm import chat_with_memory, stream_llm_response  # noqa: E402
+from services.tts import text_to_speech  # noqa: E402
+from services.memory import (  # noqa: E402
     get_history,
     append_messages,
     clear_history,
@@ -16,10 +16,10 @@ from services.memory import (
     get_session_persona,
     set_session_persona,
 )
-from services.auth import get_github_auth_url, exchange_code_for_token, create_jwt, verify_jwt
-from services.rate_limiter import check_rate_limit, get_session_lock, RateLimitExceeded
-from services.transcriber import TranscriptionError
-from services.errors import ErrorCode, http_error, ws_error
+from services.auth import get_github_auth_url, exchange_code_for_token, create_jwt, verify_jwt  # noqa: E402
+from services.rate_limiter import check_rate_limit, get_session_lock, RateLimitExceeded  # noqa: E402
+from services.transcriber import TranscriptionError  # noqa: E402
+from services.errors import ErrorCode, http_error, ws_error  # noqa: E402
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 
