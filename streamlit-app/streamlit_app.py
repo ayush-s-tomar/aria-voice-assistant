@@ -1,5 +1,5 @@
-"""
-ARIA – Voice AI Assistant (Streamlit edition)
+﻿"""
+ARIA â€“ Voice AI Assistant (Streamlit edition)
 
 Single-file deployment target: Streamlit Community Cloud (free).
 No FastAPI, no WebSocket server, no Render. Everything runs in one process.
@@ -15,7 +15,7 @@ import uuid
 
 import streamlit as st
 
-# ── Secrets → env (MUST run before importing services.*) ─────────────────────
+# â”€â”€ Secrets â†’ env (MUST run before importing services.*) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 for k in [
     "GROQ_API_KEY", "TAVILY_API_KEY", "ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID",
     "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
@@ -38,9 +38,9 @@ from services.memory import (
 
 ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
 
-st.set_page_config(page_title=ARIA_NAME, page_icon="🎙️", layout="centered")
+st.set_page_config(page_title=ARIA_NAME, page_icon="ðŸŽ™ï¸", layout="centered")
 
-# ── Visual polish ──────────────────────────────────────────────────────────
+# â”€â”€ Visual polish â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.markdown(
     """
     <style>
@@ -132,9 +132,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Session identity ──────────────────────────────────────────────────────────
+# â”€â”€ Session identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # session_id is PINNED in session_state. It is only ever changed explicitly,
-# via the on_change callback below — never recomputed as a bare local variable
+# via the on_change callback below â€” never recomputed as a bare local variable
 # on every rerun. This is what previously caused "Apply persona" and the chat
 # pipeline to sometimes read/write under different session keys.
 if "anon_session_id" not in st.session_state:
@@ -152,25 +152,25 @@ if "_last_audio_hash" not in st.session_state:
 
 def _sync_session_id():
     """Called on every keystroke change of the name field (on_change),
-    so session_id updates immediately and deterministically — not lazily
+    so session_id updates immediately and deterministically â€” not lazily
     on the next unrelated rerun (e.g. a button click)."""
     name = st.session_state.get("display_name", "").strip().lower()
     st.session_state.session_id = name if name else st.session_state.anon_session_id
 
 
-# ── Sidebar ────────────────────────────────────────────────────────────────────
+# â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 with st.sidebar:
-    st.markdown(f"## 🎙️ {ARIA_NAME}")
+    st.markdown(f"## ðŸŽ™ï¸ {ARIA_NAME}")
     st.caption("AI Real-Time Intelligent Assistant")
 
     st.text_input(
-        "Your name (optional — enables cross-device memory)",
+        "Your name (optional â€” enables cross-device memory)",
         key="display_name",
         placeholder="e.g. ayush",
         on_change=_sync_session_id,
     )
 
-    # Always resolve from the pinned value — never recompute inline here.
+    # Always resolve from the pinned value â€” never recompute inline here.
     session_id = st.session_state.session_id
     st.caption(f"Session: `{session_id}`")
 
@@ -195,7 +195,7 @@ with st.sidebar:
         persona_text = _presets[preset]
 
     if st.button("Apply persona", use_container_width=True):
-        # Uses the pinned session_id — guaranteed in sync with the name field
+        # Uses the pinned session_id â€” guaranteed in sync with the name field
         # because on_change fired before this rerun even started.
         if persona_text:
             set_session_persona(session_id, persona_text)
@@ -208,11 +208,11 @@ with st.sidebar:
     voice_choice = st.radio("Voice engine", ["Free (gTTS)", "ElevenLabs (needs key)"], index=0)
     use_elevenlabs = voice_choice == "ElevenLabs (needs key)" and bool(os.getenv("ELEVENLABS_API_KEY"))
     if voice_choice == "ElevenLabs (needs key)" and not os.getenv("ELEVENLABS_API_KEY"):
-        st.warning("No ELEVENLABS_API_KEY set — falling back to gTTS.")
+        st.warning("No ELEVENLABS_API_KEY set â€” falling back to gTTS.")
     autoplay = st.checkbox("Auto-play replies", value=True)
 
     st.divider()
-    if st.button("🗑️ Clear conversation", use_container_width=True):
+    if st.button("ðŸ—‘ï¸ Clear conversation", use_container_width=True):
         clear_history(session_id)
         st.session_state.messages = []
         st.session_state._last_audio_hash = None
@@ -220,18 +220,18 @@ with st.sidebar:
 
     meta = get_session_metadata(session_id)
     persistence_note = "persistent (Upstash)" if meta["persistent"] else "this browser tab only"
-    st.caption(f"Memory: {persistence_note} · {meta['message_count']} msgs stored")
+    st.caption(f"Memory: {persistence_note} Â· {meta['message_count']} msgs stored")
 
-# ── Load history from Redis on first run of this session ─────────────────────
+# â”€â”€ Load history from Redis on first run of this session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if not st.session_state.messages:
     st.session_state.messages = get_history(session_id)
 
-# ── Hero banner + conversation ────────────────────────────────────────────────
+# â”€â”€ Hero banner + conversation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.markdown(
     f"""
     <div class="aria-hero">
-        <h1>Ask Anything → Real-Time Reasoning → Spoken Response</h1>
-        <p>Voice AI · Groq Whisper + LLaMA 3.3-70B · Live tool use · Persistent memory</p>
+        <h1>Ask Anything â†’ Real-Time Reasoning â†’ Spoken Response</h1>
+        <p>Voice AI Â· Groq Whisper + LLaMA 3.3-70B Â· Live tool use Â· Persistent memory</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -245,13 +245,13 @@ for msg in st.session_state.messages:
 
 st.divider()
 
-# ── Input: voice or text ───────────────────────────────────────────────────────
+# â”€â”€ Input: voice or text â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.markdown("**🎤 Speak**")
+    st.markdown("**ðŸŽ¤ Speak**")
     audio_value = st.audio_input("Record a message", label_visibility="collapsed")
 with col2:
-    st.markdown("**⌨️ Or type**")
+    st.markdown("**âŒ¨ï¸ Or type**")
     typed_text = st.chat_input("Type a message to ARIA...")
 
 user_text = None
@@ -276,7 +276,7 @@ if audio_value is not None:
 if typed_text:
     user_text = typed_text
 
-# ── Run the pipeline on new input ─────────────────────────────────────────────
+# â”€â”€ Run the pipeline on new input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if user_text:
     st.session_state.messages.append({"role": "user", "content": user_text})
     with st.chat_message("user"):
@@ -289,17 +289,17 @@ if user_text:
     persona = get_session_persona(session_id) or ""
 
     # Inject the user's name as a fact the model can actually see.
-    # The sidebar text field previously only affected the Redis session key —
+    # The sidebar text field previously only affected the Redis session key â€”
     # it was never passed into the system prompt, so ARIA had history but no name.
     display_name = st.session_state.get("display_name", "")
     if display_name.strip():
-        # Phrased as background context with an explicit usage rule —
+        # Phrased as background context with an explicit usage rule â€”
         # otherwise LLaMA treats a bare "The user's name is X" fact as an
         # instruction to open every reply with the name.
         name_fact = (
             f"(Background only: the user's name is {display_name.strip()}. "
             "You may know this, but do not greet them by name or mention "
-            "their name in every reply — only use it when it's naturally "
+            "their name in every reply â€” only use it when it's naturally "
             "relevant, e.g. if they ask you to.)"
         )
         persona = f"{name_fact} {persona}".strip()
@@ -315,7 +315,7 @@ if user_text:
 
         if assistant_text:
             if tools_used:
-                st.caption(f"🛠️ used: {', '.join(tools_used)}")
+                st.caption(f"ðŸ› ï¸ used: {', '.join(tools_used)}")
             st.write(assistant_text)
 
             audio_bytes = None
