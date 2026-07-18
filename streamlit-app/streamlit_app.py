@@ -37,10 +37,8 @@ from services.memory import (
 )
 
 ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
-USER_AVATAR = "Y"
-ARIA_AVATAR = "A"
 
-st.set_page_config(page_title=ARIA_NAME, page_icon=":microphone:", layout="centered")
+st.set_page_config(page_title=ARIA_NAME, page_icon="\U0001F3A4", layout="centered")
 
 # -- Visual polish -------------------------------------------------------------
 st.markdown(
@@ -137,15 +135,13 @@ if "messages" not in st.session_state:
 if "_last_audio_hash" not in st.session_state:
     st.session_state._last_audio_hash = None
 
-
 def _sync_session_id():
     name = st.session_state.get("display_name", "").strip().lower()
     st.session_state.session_id = name if name else st.session_state.anon_session_id
 
-
 # -- Sidebar --------------------------------------------------------------------
 with st.sidebar:
-    st.markdown(f"## :studio_microphone: {ARIA_NAME}")
+    st.markdown(f"## {ARIA_NAME}")
     st.caption("AI Real-Time Intelligent Assistant")
 
     st.text_input(
@@ -220,8 +216,8 @@ st.markdown(
 )
 
 for msg in st.session_state.messages:
-    avatar = USER_AVATAR if msg["role"] == "user" else ARIA_AVATAR
-    with st.chat_message(msg["role"], avatar=avatar):
+    
+    with st.chat_message(msg["role"]):
         st.write(msg["content"])
         if msg["role"] == "assistant" and msg.get("audio"):
             st.audio(msg["audio"], format="audio/mp3", autoplay=False)
@@ -262,7 +258,7 @@ if typed_text:
 # -- Run the pipeline on new input -------------------------------------------------
 if user_text:
     st.session_state.messages.append({"role": "user", "content": user_text})
-    with st.chat_message("user", avatar=USER_AVATAR):
+    with st.chat_message("user"):
         st.write(user_text)
 
     history = get_history(session_id)
@@ -278,7 +274,7 @@ if user_text:
         )
         persona = f"{name_fact} {persona}".strip()
 
-    with st.chat_message("assistant", avatar=ARIA_AVATAR):
+    with st.chat_message("assistant"):
         assistant_text = None
         tools_used = None
         with st.spinner("Thinking..."):
