@@ -1,21 +1,33 @@
-# 🎙️ ARIA – Voice AI Assistant
+# 🎙️ ARIA — Voice AI Assistant
 
-**Speech-to-Speech AI assistant** built with Groq Whisper + LLaMA 3.3-70B + gTTS/ElevenLabs  
-Pipeline: `Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS/ElevenLabs TTS → Voice response`
+**Speech-to-Speech AI assistant** built with Groq Whisper + LLaMA 3.3-70B + gTTS/ElevenLabs
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-LLaMA%203.3--70B-orange)
-![Upstash](https://img.shields.io/badge/Memory-Upstash%20Redis-red?logo=redis&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-green)
+**Pipeline:** Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS/ElevenLabs TTS → Voice response
 
-🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)  
-⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)  
+[![CI](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Groq](https://img.shields.io/badge/LLM-Groq%20LLaMA%203.3--70B-orange)](https://groq.com/)
+[![Upstash](https://img.shields.io/badge/Memory-Upstash%20Redis-00E9A3)](https://upstash.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)
+⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)
 📖 **API Docs:** [aria-voice-assistant-6eze.onrender.com/docs](https://aria-voice-assistant-6eze.onrender.com/docs)
+
+> Note: the backend is on Render's free tier, so the first request after idle may take 30–60s to wake up.
 
 ---
 
-![ARIA Demo](docs/demo.png)
+## 🎬 Demo
+
+![ARIA demo screenshot](docs/icons/demo-screenshot.png)
+
+**Full walkthrough video:**
+
+https://github.com/ayush-s-tomar/aria-voice-assistant/assets/demo/ARIA_Demo_Sonam_FINAL.mp4
+
+*(GitHub renders this inline once uploaded — see [Adding the demo assets](#-adding-the-demo-assets) below.)*
 
 ---
 
@@ -52,8 +64,10 @@ aria-voice-assistant/
 │       └── auth.py              # GitHub OAuth + JWT creation / verification
 ├── frontend/
 │   └── index.html               # Single-file voice UI — WebSocket, streaming, theme toggle
-├── docs/                        # GitHub Pages deployment (copy of frontend)
+├── docs/                        # GitHub Pages deployment (copy of frontend) + demo assets
+├── .github/workflows/ci.yml     # CI — lint + import check on every push/PR
 ├── render.yaml                  # One-click Render deploy config
+├── LICENSE                      # MIT
 └── README.md
 ```
 
@@ -61,17 +75,17 @@ aria-voice-assistant/
 
 ## 🔋 Tech Stack
 
-| Layer | Tech |
-|---|---|
-| STT | Groq Whisper large-v3 (cloud, free, 99 languages) |
-| LLM | Groq · LLaMA 3.3-70B (streaming + tool use) |
-| TTS | gTTS (free) / ElevenLabs multilingual v2 (premium) |
-| Memory | Upstash Redis (persistent, survives redeploys) |
-| Tools | Tavily web search · calculator · wttr.in weather · Wikipedia REST · datetime · unit converter |
-| Auth | GitHub OAuth · JWT sessions |
-| API | FastAPI · Uvicorn · WebSockets |
-| Frontend | Vanilla HTML/CSS/JS (no framework) |
-| Deploy | Render (backend) · GitHub Pages (frontend) |
+| Layer     | Tech                                                              |
+| --------- | ------------------------------------------------------------------ |
+| STT       | Groq Whisper large-v3 (cloud, free, 99 languages)                  |
+| LLM       | Groq · LLaMA 3.3-70B (streaming + tool use)                        |
+| TTS       | gTTS (free) / ElevenLabs multilingual v2 (premium)                 |
+| Memory    | Upstash Redis (persistent, survives redeploys)                     |
+| Tools     | Tavily web search · calculator · wttr.in weather · Wikipedia REST · datetime · unit converter |
+| Auth      | GitHub OAuth · JWT sessions                                        |
+| API       | FastAPI · Uvicorn · WebSockets                                     |
+| Frontend  | Vanilla HTML/CSS/JS (no framework)                                 |
+| CI/CD     | GitHub Actions (lint + import check) · Render (backend) · GitHub Pages (frontend) |
 
 ---
 
@@ -83,8 +97,7 @@ aria-voice-assistant/
 - Upstash Redis database → [upstash.com](https://upstash.com) (free)
 
 ### Step 1 — Clone & setup
-
-```powershell
+```bash
 git clone https://github.com/ayush-s-tomar/aria-voice-assistant.git
 cd aria-voice-assistant/backend
 
@@ -94,13 +107,10 @@ pip install -r requirements.txt
 ```
 
 ### Step 2 — Configure environment
-
-```powershell
+```bash
 copy .env.example .env
 ```
-
 Edit `.env`:
-
 ```env
 # Required
 GROQ_API_KEY=your_groq_api_key_here
@@ -124,61 +134,59 @@ SESSION_TTL_HOURS=24       # how long sessions persist in Redis
 ```
 
 ### Step 3 — Run
-
-```powershell
+```bash
 uvicorn main:app --reload --port 8000
 ```
-
 Then open `frontend/index.html` in Chrome.
 
 ---
 
 ## 🌐 API Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/` | Health check |
-| GET | `/auth/login` | Redirect to GitHub OAuth |
-| GET | `/auth/callback` | OAuth callback — returns JWT |
-| GET | `/auth/me` | Current user info from JWT |
-| WS | `/ws/{session_id}` | Full streaming pipeline: audio → STT → LLM → TTS chunks |
-| POST | `/chat/voice` | HTTP fallback: audio → STT → LLM → TTS → audio |
-| POST | `/chat/text` | Text-only: message → LLM response |
-| GET | `/session/{id}` | Session metadata (message count, persona, TTL) |
-| PUT | `/session/{id}/persona` | Set persona override for this session |
-| DELETE | `/session/{id}` | Clear session history and persona |
+| Method | Endpoint                  | Description                                          |
+| ------ | -------------------------- | ------------------------------------------------------ |
+| GET    | `/`                         | Health check                                            |
+| GET    | `/auth/login`               | Redirect to GitHub OAuth                                 |
+| GET    | `/auth/callback`            | OAuth callback — returns JWT                              |
+| GET    | `/auth/me`                  | Current user info from JWT                               |
+| WS     | `/ws/{session_id}`          | Full streaming pipeline: audio → STT → LLM → TTS chunks   |
+| POST   | `/chat/voice`                | HTTP fallback: audio → STT → LLM → TTS → audio            |
+| POST   | `/chat/text`                 | Text-only: message → LLM response                       |
+| GET    | `/session/{id}`              | Session metadata (message count, persona, TTL)          |
+| PUT    | `/session/{id}/persona`      | Set persona override for this session                    |
+| DELETE | `/session/{id}`              | Clear session history and persona                        |
 
 ---
 
 ## 🚀 Deploy your own
 
 ### 1 — Upstash Redis (memory)
-1. Go to [upstash.com](https://upstash.com) → Create database → choose a region
-2. Copy **REST URL** and **REST Token** from the database dashboard
+- Go to [upstash.com](https://upstash.com) → Create database → choose a region
+- Copy REST URL and REST Token from the database dashboard
 
 ### 2 — GitHub OAuth (optional login)
-1. Go to GitHub → Settings → Developer Settings → OAuth Apps → New OAuth App
-2. Set Homepage URL to your Render URL
-3. Set Callback URL to `https://your-render-url.onrender.com/auth/callback`
-4. Copy Client ID and Client Secret
+- Go to GitHub → Settings → Developer Settings → OAuth Apps → New OAuth App
+- Set Homepage URL to your Render URL
+- Set Callback URL to `https://your-render-url.onrender.com/auth/callback`
+- Copy Client ID and Client Secret
 
 ### 3 — Backend → Render
-1. Fork this repo
-2. Go to [render.com](https://render.com) → New → Web Service
-3. Connect your fork — `render.yaml` is auto-detected
-4. Add env vars in Render dashboard (see `.env.example`)
-5. Deploy
+- Fork this repo
+- Go to [render.com](https://render.com) → New → Web Service
+- Connect your fork — `render.yaml` is auto-detected
+- Add env vars in Render dashboard (see `.env.example`)
+- Deploy
 
 ### 4 — Frontend → GitHub Pages
-1. Update `const API` and `const WS_API` in `frontend/index.html` with your Render URL
-2. Copy to `docs/index.html` and push
-3. Enable GitHub Pages → branch: `main` → folder: `/docs`
+- Update `const API` and `const WS_API` in `frontend/index.html` with your Render URL
+- Copy to `docs/index.html` and push
+- Enable GitHub Pages → branch: `main` → folder: `/docs`
 
 ---
 
 ## 🧠 How memory works
 
-Each browser tab generates a unique `session_id`. History is stored in **Upstash Redis** as a rolling 20-message window — it persists across server restarts, Render redeploys, and browser refreshes. Authenticated users get namespaced sessions (`user:{github_id}:session:{id}`) so their history is private. Sessions expire after 24 hours by default (configurable via `SESSION_TTL_HOURS`).
+Each browser tab generates a unique `session_id`. History is stored in Upstash Redis as a rolling 20-message window — it persists across server restarts, Render redeploys, and browser refreshes. Authenticated users get namespaced sessions (`user:{github_id}:session:{id}`) so their history is private. Sessions expire after 24 hours by default (configurable via `SESSION_TTL_HOURS`).
 
 ---
 
@@ -186,14 +194,14 @@ Each browser tab generates a unique `session_id`. History is stored in **Upstash
 
 ARIA automatically selects the right tool based on your message — no commands needed.
 
-| Tool | Trigger examples | Requires |
-|---|---|---|
-| `web_search` | "Latest AI news", "Who won IPL 2025?" | `TAVILY_API_KEY` |
-| `calculator` | "15% of 8500", "sqrt(144) + 20" | Nothing |
-| `get_weather` | "Weather in Mumbai", "Is it raining in Delhi?" | Nothing — uses wttr.in |
-| `wikipedia` | "Who is APJ Abdul Kalam?", "Tell me about black holes" | Nothing |
-| `get_datetime` | "What time is it?", "What day is today?" | Nothing |
-| `unit_converter` | "100 km to miles", "37°C in Fahrenheit" | Nothing |
+| Tool             | Trigger examples                                  | Requires             |
+| ----------------- | --------------------------------------------------- | ---------------------- |
+| `web_search`       | "Latest AI news", "Who won IPL 2025?"                 | `TAVILY_API_KEY`         |
+| `calculator`        | "15% of 8500", "sqrt(144) + 20"                       | Nothing                  |
+| `get_weather`        | "Weather in Mumbai", "Is it raining in Delhi?"          | Nothing — uses wttr.in     |
+| `wikipedia`           | "Who is APJ Abdul Kalam?", "Tell me about black holes"    | Nothing                     |
+| `get_datetime`         | "What time is it?", "What day is today?"                    | Nothing                       |
+| `unit_converter`        | "100 km to miles", "37°C in Fahrenheit"                        | Nothing                          |
 
 ---
 
@@ -215,7 +223,23 @@ Hit **Customize ARIA** in the sidebar to give ARIA a per-session tone. Choose a 
 
 ---
 
+## ✅ CI/CD
+
+Every push and PR to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+- **Backend** — installs dependencies, lints with `ruff`, verifies `main.py` imports cleanly
+- **Frontend** — checks `frontend/index.html` and `docs/index.html` are present and non-empty
+
+Deployment is separate from CI: the backend auto-deploys to Render on push to `main` (via Render's GitHub integration), and the frontend auto-deploys to GitHub Pages from `/docs`.
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
 ## 🛠️ Built by
 
-**Ayush Singh Tomar** — AI Developer  
-[LinkedIn](https://linkedin.com/in/ayushsinghtomar) · [GitHub](https://github.com/ayush-s-tomar) · [Portfolio](https://agentloop.onrender.com)
+**Ayush Singh Tomar** — AI Developer
+[LinkedIn](https://linkedin.com/in/ayush-s-tomar) · [GitHub](https://github.com/ayush-s-tomar) · [Portfolio](https://ayush-s-tomar.github.io)
