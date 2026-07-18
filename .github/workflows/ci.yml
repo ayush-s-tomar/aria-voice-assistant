@@ -41,6 +41,15 @@ jobs:
           FRONTEND_URL: http://localhost:8000
         run: python -c "import main"
 
+      - name: Run tests
+        env:
+          GROQ_API_KEY: dummy
+          UPSTASH_REDIS_REST_URL: https://dummy.upstash.io
+          UPSTASH_REDIS_REST_TOKEN: dummy
+          JWT_SECRET: dummy
+          FRONTEND_URL: http://localhost:8000
+        run: python -m pytest tests/ -v
+
   frontend:
     name: Frontend — HTML validity
     runs-on: ubuntu-latest
