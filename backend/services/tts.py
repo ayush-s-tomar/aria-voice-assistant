@@ -15,9 +15,9 @@ import os
 
 from gtts import gTTS
 
-# ΓöÇΓöÇ In-memory TTS cache ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-# Key: (text_hash, lang) ΓåÆ Value: MP3 bytes
-# Lives for the lifetime of the server process ΓÇö survives across requests,
+# ── In-memory TTS cache ──────────────────────────────────────────────────────
+# Key: (text_hash, lang) → Value: MP3 bytes
+# Lives for the lifetime of the server process — survives across requests,
 # resets on redeploy (intentional: no stale audio from old model versions).
 _cache: dict[tuple[str, str], bytes] = {}
 MAX_CACHE_ENTRIES = int(os.getenv("TTS_CACHE_SIZE", "200"))
@@ -41,9 +41,9 @@ def _set_cached(text: str, lang: str, audio: bytes) -> None:
     _cache[_cache_key(text, lang)] = audio
 
 
-# ΓöÇΓöÇ gTTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+# ── gTTS ──────────────────────────────────────────────────────────────────────
 
-# Map Whisper language codes ΓåÆ gTTS-compatible codes where they differ
+# Map Whisper language codes → gTTS-compatible codes where they differ
 _GTTS_LANG_MAP: dict[str, str] = {
     "zh":    "zh-CN",
     "zh-tw": "zh-TW",
@@ -61,7 +61,7 @@ def _tts_gtts(text: str, lang: str = "en") -> bytes:
     try:
         tts = gTTS(text=text, lang=gtts_lang, slow=False)
     except ValueError:
-        # gTTS doesn't support the language ΓÇö fall back to English
+        # gTTS doesn't support the language — fall back to English
         print(f"[TTS] gTTS doesn't support lang='{gtts_lang}', falling back to en")
         tts = gTTS(text=text, lang="en", slow=False)
 
@@ -71,7 +71,7 @@ def _tts_gtts(text: str, lang: str = "en") -> bytes:
     return buf.read()
 
 
-# ΓöÇΓöÇ ElevenLabs ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+# ── ElevenLabs ────────────────────────────────────────────────────────────────
 
 def _tts_elevenlabs(text: str, lang: str = "en") -> bytes:
     """
@@ -100,7 +100,7 @@ def _tts_elevenlabs(text: str, lang: str = "en") -> bytes:
     return response.content
 
 
-# ΓöÇΓöÇ Public interface ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+# ── Public interface ─────────────────────────────────────────────────────────
 
 def text_to_speech(text: str, lang: str = "en") -> bytes:
     """
