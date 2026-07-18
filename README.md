@@ -228,7 +228,7 @@ Hit **Customize ARIA** in the sidebar to give ARIA a per-session tone. Choose a 
 ## ✅ CI/CD
 
 Every push and PR to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
-- **Backend** — installs dependencies, lints with `ruff`, verifies `main.py` imports cleanly
+- **Backend** — installs dependencies, lints with `ruff`, verifies `main.py` imports cleanly, runs the pytest suite
 - **Frontend** — checks `frontend/index.html` and `docs/index.html` are present and non-empty
 
 Deployment is separate from CI: the backend auto-deploys to Render on push to `main` (via Render's GitHub integration), and the frontend auto-deploys to GitHub Pages from `/docs`.
