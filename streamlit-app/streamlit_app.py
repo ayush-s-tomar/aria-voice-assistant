@@ -1,5 +1,5 @@
 ﻿"""
-ARIA â€“ Voice AI Assistant (Streamlit edition)
+ARIA - Voice AI Assistant (Streamlit edition)
 
 Single-file deployment target: Streamlit Community Cloud (free).
 No FastAPI, no WebSocket server, no Render. Everything runs in one process.
@@ -15,7 +15,7 @@ import uuid
 
 import streamlit as st
 
-# â”€â”€ Secrets â†’ env (MUST run before importing services.*) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Secrets -> env (MUST run before importing services.*) -------------------
 for k in [
     "GROQ_API_KEY", "TAVILY_API_KEY", "ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID",
     "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
@@ -37,15 +37,15 @@ from services.memory import (
 )
 
 ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
+USER_AVATAR = "\U0001F9D1"       # person
+ARIA_AVATAR = "\U0001F3A4"       # microphone
 
-st.set_page_config(page_title=ARIA_NAME, page_icon="ðŸŽ™ï¸", layout="centered")
+st.set_page_config(page_title=ARIA_NAME, page_icon="\U0001F3A4", layout="centered")
 
-# â”€â”€ Visual polish â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Visual polish -------------------------------------------------------------
 st.markdown(
     """
     <style>
-    /* Audio player: default browser controls look washed-out on dark themes.
-       This re-skins the <audio> element to match the app's palette. */
     audio {
         width: 100%;
         height: 40px;
@@ -55,8 +55,6 @@ st.markdown(
         margin-top: 6px;
     }
 
-    /* Chat bubbles: give user vs assistant messages distinct backgrounds
-       and a bit of breathing room instead of flat, same-toned blocks. */
     [data-testid="stChatMessage"] {
         border-radius: 14px;
         padding: 14px 16px;
@@ -70,7 +68,6 @@ st.markdown(
         background: linear-gradient(135deg, #1c1f2b, #171a24);
     }
 
-    /* Sidebar: tighten label spacing, add breathing room between sections. */
     section[data-testid="stSidebar"] {
         padding-top: 0.5rem;
     }
@@ -85,8 +82,6 @@ st.markdown(
         font-size: 0.85rem;
         opacity: 0.85;
     }
-
-    /* Buttons: consistent rounded style instead of Streamlit's flat default. */
     section[data-testid="stSidebar"] button {
         border-radius: 8px !important;
         transition: transform 0.1s ease;
@@ -95,17 +90,14 @@ st.markdown(
         transform: translateY(-1px);
     }
 
-    /* Recorder + chat input: round corners so they match the rest of the UI. */
     [data-testid="stAudioInput"], [data-testid="stChatInput"] {
         border-radius: 12px;
     }
 
-    /* App-wide dark purple gradient backdrop, matching the main frontend. */
     .stApp {
         background: radial-gradient(circle at 20% -10%, #241a3d 0%, #0e0f14 45%);
     }
 
-    /* Hero banner replacing the plain st.title/st.caption pair. */
     .aria-hero {
         text-align: center;
         padding: 1.75rem 1rem 1.25rem 1rem;
@@ -132,11 +124,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# â”€â”€ Session identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# session_id is PINNED in session_state. It is only ever changed explicitly,
-# via the on_change callback below â€” never recomputed as a bare local variable
-# on every rerun. This is what previously caused "Apply persona" and the chat
-# pipeline to sometimes read/write under different session keys.
+# -- Session identity -----------------------------------------------------------
 if "anon_session_id" not in st.session_state:
     st.session_state.anon_session_id = str(uuid.uuid4())[:8]
 
@@ -151,26 +139,22 @@ if "_last_audio_hash" not in st.session_state:
 
 
 def _sync_session_id():
-    """Called on every keystroke change of the name field (on_change),
-    so session_id updates immediately and deterministically â€” not lazily
-    on the next unrelated rerun (e.g. a button click)."""
     name = st.session_state.get("display_name", "").strip().lower()
     st.session_state.session_id = name if name else st.session_state.anon_session_id
 
 
-# â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Sidebar --------------------------------------------------------------------
 with st.sidebar:
-    st.markdown(f"## ðŸŽ™ï¸ {ARIA_NAME}")
+    st.markdown(f"## {ARIA_AVATAR} {ARIA_NAME}")
     st.caption("AI Real-Time Intelligent Assistant")
 
     st.text_input(
-        "Your name (optional â€” enables cross-device memory)",
+        "Your name (optional - enables cross-device memory)",
         key="display_name",
         placeholder="e.g. ayush",
         on_change=_sync_session_id,
     )
 
-    # Always resolve from the pinned value â€” never recompute inline here.
     session_id = st.session_state.session_id
     st.caption(f"Session: `{session_id}`")
 
@@ -195,8 +179,6 @@ with st.sidebar:
         persona_text = _presets[preset]
 
     if st.button("Apply persona", use_container_width=True):
-        # Uses the pinned session_id â€” guaranteed in sync with the name field
-        # because on_change fired before this rerun even started.
         if persona_text:
             set_session_persona(session_id, persona_text)
             st.success(f"Persona updated for session `{session_id}`.")
@@ -208,11 +190,11 @@ with st.sidebar:
     voice_choice = st.radio("Voice engine", ["Free (gTTS)", "ElevenLabs (needs key)"], index=0)
     use_elevenlabs = voice_choice == "ElevenLabs (needs key)" and bool(os.getenv("ELEVENLABS_API_KEY"))
     if voice_choice == "ElevenLabs (needs key)" and not os.getenv("ELEVENLABS_API_KEY"):
-        st.warning("No ELEVENLABS_API_KEY set â€” falling back to gTTS.")
+        st.warning("No ELEVENLABS_API_KEY set - falling back to gTTS.")
     autoplay = st.checkbox("Auto-play replies", value=True)
 
     st.divider()
-    if st.button("ðŸ—‘ï¸ Clear conversation", use_container_width=True):
+    if st.button("Clear conversation", use_container_width=True):
         clear_history(session_id)
         st.session_state.messages = []
         st.session_state._last_audio_hash = None
@@ -220,38 +202,39 @@ with st.sidebar:
 
     meta = get_session_metadata(session_id)
     persistence_note = "persistent (Upstash)" if meta["persistent"] else "this browser tab only"
-    st.caption(f"Memory: {persistence_note} Â· {meta['message_count']} msgs stored")
+    st.caption(f"Memory: {persistence_note} - {meta['message_count']} msgs stored")
 
-# â”€â”€ Load history from Redis on first run of this session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Load history from Redis on first run of this session -----------------------
 if not st.session_state.messages:
     st.session_state.messages = get_history(session_id)
 
-# â”€â”€ Hero banner + conversation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Hero banner + conversation --------------------------------------------------
 st.markdown(
     f"""
     <div class="aria-hero">
-        <h1>Ask Anything â†’ Real-Time Reasoning â†’ Spoken Response</h1>
-        <p>Voice AI Â· Groq Whisper + LLaMA 3.3-70B Â· Live tool use Â· Persistent memory</p>
+        <h1>Ask Anything -&gt; Real-Time Reasoning -&gt; Spoken Response</h1>
+        <p>Voice AI - Groq Whisper + LLaMA 3.3-70B - Live tool use - Persistent memory</p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar = USER_AVATAR if msg["role"] == "user" else ARIA_AVATAR
+    with st.chat_message(msg["role"], avatar=avatar):
         st.write(msg["content"])
         if msg["role"] == "assistant" and msg.get("audio"):
             st.audio(msg["audio"], format="audio/mp3", autoplay=False)
 
 st.divider()
 
-# â”€â”€ Input: voice or text â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Input: voice or text ---------------------------------------------------------
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.markdown("**ðŸŽ¤ Speak**")
+    st.markdown("**Speak**")
     audio_value = st.audio_input("Record a message", label_visibility="collapsed")
 with col2:
-    st.markdown("**âŒ¨ï¸ Or type**")
+    st.markdown("**Or type**")
     typed_text = st.chat_input("Type a message to ARIA...")
 
 user_text = None
@@ -276,35 +259,26 @@ if audio_value is not None:
 if typed_text:
     user_text = typed_text
 
-# â”€â”€ Run the pipeline on new input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# -- Run the pipeline on new input -------------------------------------------------
 if user_text:
     st.session_state.messages.append({"role": "user", "content": user_text})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.write(user_text)
 
     history = get_history(session_id)
-
-    # get_session_persona can legitimately return None (nothing set yet).
-    # Guard it here so "None" never gets concatenated into the prompt string.
     persona = get_session_persona(session_id) or ""
 
-    # Inject the user's name as a fact the model can actually see.
-    # The sidebar text field previously only affected the Redis session key â€”
-    # it was never passed into the system prompt, so ARIA had history but no name.
     display_name = st.session_state.get("display_name", "")
     if display_name.strip():
-        # Phrased as background context with an explicit usage rule â€”
-        # otherwise LLaMA treats a bare "The user's name is X" fact as an
-        # instruction to open every reply with the name.
         name_fact = (
             f"(Background only: the user's name is {display_name.strip()}. "
             "You may know this, but do not greet them by name or mention "
-            "their name in every reply â€” only use it when it's naturally "
+            "their name in every reply - only use it when it's naturally "
             "relevant, e.g. if they ask you to.)"
         )
         persona = f"{name_fact} {persona}".strip()
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=ARIA_AVATAR):
         assistant_text = None
         tools_used = None
         with st.spinner("Thinking..."):
@@ -315,7 +289,7 @@ if user_text:
 
         if assistant_text:
             if tools_used:
-                st.caption(f"ðŸ› ï¸ used: {', '.join(tools_used)}")
+                st.caption(f"Tools used: {', '.join(tools_used)}")
             st.write(assistant_text)
 
             audio_bytes = None
