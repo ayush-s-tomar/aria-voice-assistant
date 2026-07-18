@@ -37,10 +37,10 @@ from services.memory import (
 )
 
 ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
-USER_AVATAR = "\U0001F9D1"       # person
-ARIA_AVATAR = "\U0001F3A4"       # microphone
+USER_AVATAR = "Y"
+ARIA_AVATAR = "A"
 
-st.set_page_config(page_title=ARIA_NAME, page_icon="\U0001F3A4", layout="centered")
+st.set_page_config(page_title=ARIA_NAME, page_icon=":microphone:", layout="centered")
 
 # -- Visual polish -------------------------------------------------------------
 st.markdown(
@@ -145,7 +145,7 @@ def _sync_session_id():
 
 # -- Sidebar --------------------------------------------------------------------
 with st.sidebar:
-    st.markdown(f"## {ARIA_AVATAR} {ARIA_NAME}")
+    st.markdown(f"## :studio_microphone: {ARIA_NAME}")
     st.caption("AI Real-Time Intelligent Assistant")
 
     st.text_input(
