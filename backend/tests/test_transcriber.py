@@ -1,4 +1,3 @@
-@'
 """Unit tests for TranscriptionError structure — no Groq API calls needed."""
 
 import sys
@@ -26,4 +25,3 @@ def test_validate_file_missing_raises_invalid_format():
         assert False, "should have raised"
     except TranscriptionError as e:
         assert e.error_code == ErrorCode.AUDIO_INVALID_FORMAT
-'@ | Out-File -Encoding utf8 backend\tests\test_transcriber.py

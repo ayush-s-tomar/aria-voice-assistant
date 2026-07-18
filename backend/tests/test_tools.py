@@ -1,4 +1,3 @@
-@'
 """Unit tests for pure-logic tool functions — no API keys or network needed."""
 
 import sys
@@ -40,4 +39,3 @@ def test_unit_converter_celsius_to_fahrenheit():
 def test_unit_converter_unknown_unit():
     result = _unit_converter(5, "bananas", "km")
     assert "Unknown unit" in result
-'@ | Out-File -Encoding utf8 backend\tests\test_tools.py
