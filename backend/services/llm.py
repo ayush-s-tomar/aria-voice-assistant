@@ -138,3 +138,68 @@ def chat_with_memory(user_message: str, history: list, persona: Optional[str] = 
         {"role": "assistant", "content": assistant_reply},
     ]
     return assistant_reply, updated_history, tool_calls_used
+
+
+async def stream_llm_response(user_message: str, history: list, persona: Optional[str] = None):
+    """Streaming version with tool use. Yields text tokens as they arrive.
+    Tool-call status updates are yielded as '\\n[tool_name…]' strings so the
+    caller (main.py) can distinguish them from real content tokens."""
+    messages = [{"role": "system", "content": build_system_prompt(persona)}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+
+    forced_choice = _pick_forced_tool_choice(user_message)
+    tool_choice = forced_choice if forced_choice else "auto"
+
+    # First call: non-streamed, so we can inspect for tool_calls cleanly
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=messages,
+        tools=TOOLS,
+        tool_choice=tool_choice,
+        max_tokens=500,
+        temperature=0.7,
+    )
+
+    msg = response.choices[0].message
+
+    if msg.tool_calls:
+        messages.append(_serialize_assistant_msg(msg))
+        for tool_call in msg.tool_calls:
+            tool_name = tool_call.function.name
+            yield f"\n[{tool_name}…]"
+            tool_args = json.loads(tool_call.function.arguments)
+            tool_result = run_tool(tool_name, tool_args)
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": tool_result,
+            })
+
+        stream = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            max_tokens=500,
+            temperature=0.7,
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+    else:
+        # No tool needed — re-issue as a streamed call for token-by-token output
+        stream = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="none",
+            max_tokens=500,
+            temperature=0.7,
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
