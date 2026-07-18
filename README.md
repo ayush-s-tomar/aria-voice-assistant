@@ -5,11 +5,15 @@
 **Pipeline:** Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS/ElevenLabs TTS → Voice response
 
 [![CI](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml)
+[![Deploy](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/pages/pages-build-deployment)
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20LLaMA%203.3--70B-orange)](https://groq.com/)
 [![Upstash](https://img.shields.io/badge/Memory-Upstash%20Redis-00E9A3)](https://upstash.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/ayush-s-tomar/aria-voice-assistant?style=social)](https://github.com/ayush-s-tomar/aria-voice-assistant/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant/commits/main)
+[![Repo Size](https://img.shields.io/github/repo-size/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant)
 
 🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)
 ⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)
@@ -25,9 +29,7 @@
 
 **Full walkthrough video:**
 
-https://github.com/ayush-s-tomar/aria-voice-assistant/assets/demo/ARIA_Demo_Sonam_FINAL.mp4
-
-*(GitHub renders this inline once uploaded — see [Adding the demo assets](#-adding-the-demo-assets) below.)*
+[▶️ Watch the demo](https://github.com/user-attachments/assets/04c5fefa-c685-4400-b402-237e638e5c85)
 
 ---
 
