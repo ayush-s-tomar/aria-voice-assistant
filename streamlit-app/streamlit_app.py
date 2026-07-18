@@ -99,6 +99,34 @@ st.markdown(
     [data-testid="stAudioInput"], [data-testid="stChatInput"] {
         border-radius: 12px;
     }
+
+    /* App-wide dark purple gradient backdrop, matching the main frontend. */
+    .stApp {
+        background: radial-gradient(circle at 20% -10%, #241a3d 0%, #0e0f14 45%);
+    }
+
+    /* Hero banner replacing the plain st.title/st.caption pair. */
+    .aria-hero {
+        text-align: center;
+        padding: 1.75rem 1rem 1.25rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #2a1f4d 0%, #1a1330 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .aria-hero h1 {
+        font-size: 1.9rem;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(90deg, #a78bfa, #f472b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .aria-hero p {
+        color: rgba(255,255,255,0.65);
+        font-size: 0.9rem;
+        margin-top: 0.4rem;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -198,9 +226,16 @@ with st.sidebar:
 if not st.session_state.messages:
     st.session_state.messages = get_history(session_id)
 
-# ── Render existing conversation ──────────────────────────────────────────────
-st.title(f"🎙️ {ARIA_NAME}")
-st.caption("Speech-to-speech assistant · Groq Whisper + LLaMA 3.3-70B + TTS")
+# ── Hero banner + conversation ────────────────────────────────────────────────
+st.markdown(
+    f"""
+    <div class="aria-hero">
+        <h1>Ask Anything → Real-Time Reasoning → Spoken Response</h1>
+        <p>Voice AI · Groq Whisper + LLaMA 3.3-70B · Live tool use · Persistent memory</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
