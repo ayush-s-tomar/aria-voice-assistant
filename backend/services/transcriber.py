@@ -1,11 +1,13 @@
 """
 Speech-to-text via Groq Whisper large-v3.
-(Streamlit port — same logic as the FastAPI version, minus the
-FastAPI-specific ErrorCode plumbing. Raises plain TranscriptionError.)
+Raises TranscriptionError with a structured error_code so callers in
+main.py can branch on it (e.g. return 413 for AUDIO_TOO_LARGE) instead
+of string-matching free-text messages.
 """
 
 import os
 from groq import Groq
+from services.errors import ErrorCode
 
 _client = None
 
@@ -18,8 +20,9 @@ SUPPORTED_LANGUAGE_LOCKS = {
 
 
 class TranscriptionError(Exception):
-    def __init__(self, message: str):
+    def __init__(self, message: str, error_code: str = ErrorCode.TRANSCRIPTION_FAILED):
         self.message = message
+        self.error_code = error_code
         super().__init__(message)
 
 
@@ -32,14 +35,17 @@ def _get_client() -> Groq:
 
 def _validate_file(file_path: str) -> int:
     if not os.path.exists(file_path):
-        raise TranscriptionError("Audio file not found")
+        raise TranscriptionError("Audio file not found", ErrorCode.AUDIO_INVALID_FORMAT)
 
     size = os.path.getsize(file_path)
     if size < MIN_AUDIO_BYTES:
-        raise TranscriptionError("Audio clip is empty or too short to transcribe")
+        raise TranscriptionError(
+            "Audio clip is empty or too short to transcribe", ErrorCode.AUDIO_EMPTY
+        )
     if size > MAX_AUDIO_BYTES:
         raise TranscriptionError(
-            f"Audio file exceeds the {MAX_AUDIO_BYTES // (1024 * 1024)}MB limit"
+            f"Audio file exceeds the {MAX_AUDIO_BYTES // (1024 * 1024)}MB limit",
+            ErrorCode.AUDIO_TOO_LARGE,
         )
     return size
 
@@ -63,7 +69,9 @@ def transcribe_audio(file_path: str, language: str | None = None) -> tuple[str, 
             )
     except Exception as e:
         print(f"[Groq Whisper] API error on {size}-byte file: {e}")
-        raise TranscriptionError("Speech-to-text service failed") from e
+        raise TranscriptionError(
+            "Speech-to-text service failed", ErrorCode.TRANSCRIPTION_FAILED
+        ) from e
 
     text = result.text.strip()
     detected = getattr(result, "language", None) or lock_lang or "en"
