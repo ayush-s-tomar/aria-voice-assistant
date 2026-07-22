@@ -15,21 +15,24 @@
 [![Last Commit](https://img.shields.io/github/last-commit/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant/commits/main)
 [![Repo Size](https://img.shields.io/github/repo-size/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant)
 
-🌐 **Live Demo:** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)
+🌐 **Try it live (Streamlit):** [aria-assistant.streamlit.app](https://aria-assistant.streamlit.app/)
+🌐 **Live Demo (GitHub Pages):** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)
 ⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)
 📖 **API Docs:** [aria-voice-assistant-6eze.onrender.com/docs](https://aria-voice-assistant-6eze.onrender.com/docs)
 
-> Note: the backend is on Render's free tier, so the first request after idle may take 30–60s to wake up.
+> Note: the Render backend is on the free tier, so the first request after idle may take 30–60s to wake up.
 
 ---
 
 ## 🎬 Demo
 
-![ARIA demo screenshot](docs/icons/demo-screenshot.png)
+![ARIA demo highlight](assets/ARIA.gif)
+
+![ARIA demo screenshot](assets/ARIA-Bot-Demo.png)
 
 **Full walkthrough video:**
 
-[▶️ Watch the demo](https://github.com/user-attachments/assets/04c5fefa-c685-4400-b402-237e638e5c85)
+[▶️ Watch the demo](https://github.com/user-attachments/assets/9b895558-3266-4002-9a06-5e0ee013c635)
 
 ---
 
@@ -66,6 +69,7 @@ aria-voice-assistant/
 │       └── auth.py              # GitHub OAuth + JWT creation / verification
 ├── frontend/
 │   └── index.html               # Single-file voice UI — WebSocket, streaming, theme toggle
+├── assets/                      # Demo GIF and other README media
 ├── docs/                        # GitHub Pages deployment (copy of frontend) + demo assets
 ├── .github/workflows/ci.yml     # CI — lint + import check on every push/PR
 ├── render.yaml                  # One-click Render deploy config
@@ -183,6 +187,12 @@ Then open `frontend/index.html` in Chrome.
 - Update `const API` and `const WS_API` in `frontend/index.html` with your Render URL
 - Copy to `docs/index.html` and push
 - Enable GitHub Pages → branch: `main` → folder: `/docs`
+
+### 5 — Frontend → Streamlit Community Cloud (alternative)
+- Streamlit Cloud → New app → connect this repo
+- Point to your Streamlit entry file
+- Add secrets (`GROQ_API_KEY`, Upstash credentials, etc.) in the app's Secrets manager
+- Deploy — live at your `*.streamlit.app` URL
 
 ---
 
