@@ -209,7 +209,7 @@ st.markdown(
     f"""
     <div class="aria-hero">
         <h1>Ask Anything -&gt; Real-Time Reasoning -&gt; Spoken Response</h1>
-        <p>Voice AI - Groq Whisper + LLaMA 3.3-70B - Live tool use - Persistent memory</p>
+        <p>Voice AI - Groq Whisper + GPT-OSS 120B - Live tool use - Persistent memory</p>
     </div>
     """,
     unsafe_allow_html=True,
