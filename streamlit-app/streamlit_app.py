@@ -135,6 +135,9 @@ if "messages" not in st.session_state:
 if "_last_audio_hash" not in st.session_state:
     st.session_state._last_audio_hash = None
 
+if "_autoplay_index" not in st.session_state:
+    st.session_state._autoplay_index = None
+
 def _sync_session_id():
     name = st.session_state.get("display_name", "").strip().lower()
     st.session_state.session_id = name if name else st.session_state.anon_session_id
@@ -215,12 +218,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-for msg in st.session_state.messages:
+for idx, msg in enumerate(st.session_state.messages):
 
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
         if msg["role"] == "assistant" and msg.get("audio"):
-            st.audio(msg["audio"], format="audio/mp3", autoplay=False)
+            should_autoplay = (idx == st.session_state._autoplay_index)
+            st.audio(msg["audio"], format="audio/mp3", autoplay=should_autoplay)
+
+# Autoplay is a one-shot: clear the flag after this render so the same
+# reply doesn't replay on the next unrelated rerun (e.g. persona change).
+st.session_state._autoplay_index = None
 
 st.divider()
 
@@ -296,11 +304,9 @@ if user_text:
                         lang=detected_lang,
                         use_elevenlabs=use_elevenlabs,
                     )
-                    st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
                 except TypeError:
                     try:
                         audio_bytes = text_to_speech(assistant_text, lang=detected_lang)
-                        st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
                     except Exception as e:
                         st.warning(f"Voice playback failed: {e}")
                 except Exception as e:
@@ -312,4 +318,8 @@ if user_text:
                 "content": assistant_text,
                 "audio": audio_bytes,
             })
+            # Mark this new message for one-shot autoplay on the rerun,
+            # but only if the user has autoplay enabled.
+            if autoplay and audio_bytes:
+                st.session_state._autoplay_index = len(st.session_state.messages) - 1
             st.rerun()
