@@ -21,7 +21,7 @@
 
 ## 🎬 Demo
 
-![ARIA demo screenshot](assets/ARIA-Bot-Demo.png)
+![ARIA demo](assets/ARIA.gif)
 
 **Full walkthrough video:**
 
@@ -60,7 +60,7 @@ aria-voice-assistant/
 │   └── services/                 # Same services as above, plus auth.py (GitHub OAuth + JWT)
 ├── frontend/
 │   └── index.html                # Single-file WebSocket voice UI (pairs with backend/)
-├── assets/                       # Demo screenshot and other README media
+├── assets/                       # Demo GIF, screenshot, and other README media
 ├── docs/                         # GitHub Pages deployment (copy of frontend) + demo assets
 ├── .github/workflows/ci.yml      # CI — lint + import check on every push/PR
 ├── render.yaml                   # Render deploy config (for self-hosting the backend)
