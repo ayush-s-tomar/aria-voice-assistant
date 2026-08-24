@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import json
 from groq import Groq
@@ -8,26 +8,26 @@ from services.tools import TOOLS, run_tool
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 DEFAULT_SYSTEM_PROMPT = """You are {name}, a helpful, concise, and friendly voice AI assistant.
-Keep responses conversational and brief — you're speaking aloud, not writing text.
+Keep responses conversational and brief â€” you're speaking aloud, not writing text.
 Avoid markdown, bullet points, or lists in your responses.
 
 You have access to tools: web_search, calculator, get_weather, wikipedia, get_datetime, unit_converter.
 
 CRITICAL RULE: your training data has a cutoff and does NOT know current prices, scores,
 news, or anything happening today. For ANY question about prices (crypto, stocks, currency
-rates), current events, news, weather, or "what's happening now" — you MUST call web_search
+rates), current events, news, weather, or "what's happening now" â€” you MUST call web_search
 or get_weather rather than answering from memory, even if you think you know the answer.
 Confidently answering a stale number is worse than saying you checked and got the current one.
 Only skip tools for timeless facts (history, science, definitions, general knowledge).
 
-If a tool result begins with "TOOL_UNAVAILABLE", do not guess or make up an answer —
+If a tool result begins with "TOOL_UNAVAILABLE", do not guess or make up an answer â€”
 tell the user plainly that you're unable to check that right now."""
 
 ARIA_NAME = os.getenv("ARIA_NAME", "ARIA")
 ARIA_PERSONA_EXTRA = os.getenv("ARIA_PERSONA_EXTRA", "")
 
 # Keyword patterns that should force a specific tool call rather than trusting
-# the model's "auto" judgment — LLaMA under Groq frequently skips tool_choice=auto
+# the model's "auto" judgment â€” LLaMA under Groq frequently skips tool_choice=auto
 # for things it feels falsely confident about (e.g. crypto/stock prices).
 #
 # Tightened to require more specific phrases rather than bare words like
@@ -98,7 +98,7 @@ def chat_with_memory(user_message: str, history: list, persona: Optional[str] = 
     tool_choice = forced_choice if forced_choice else "auto"
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=messages,
         tools=TOOLS,
         tool_choice=tool_choice,
@@ -124,7 +124,7 @@ def chat_with_memory(user_message: str, history: list, persona: Optional[str] = 
             })
 
         response2 = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=messages,
             max_tokens=500,
             temperature=0.7,
@@ -142,7 +142,7 @@ def chat_with_memory(user_message: str, history: list, persona: Optional[str] = 
 
 async def stream_llm_response(user_message: str, history: list, persona: Optional[str] = None):
     """Streaming version with tool use. Yields text tokens as they arrive.
-    Tool-call status updates are yielded as '\\n[tool_name…]' strings so the
+    Tool-call status updates are yielded as '\\n[tool_nameâ€¦]' strings so the
     caller (main.py) can distinguish them from real content tokens."""
     messages = [{"role": "system", "content": build_system_prompt(persona)}]
     messages.extend(history)
@@ -153,7 +153,7 @@ async def stream_llm_response(user_message: str, history: list, persona: Optiona
 
     # First call: non-streamed, so we can inspect for tool_calls cleanly
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=messages,
         tools=TOOLS,
         tool_choice=tool_choice,
@@ -167,7 +167,7 @@ async def stream_llm_response(user_message: str, history: list, persona: Optiona
         messages.append(_serialize_assistant_msg(msg))
         for tool_call in msg.tool_calls:
             tool_name = tool_call.function.name
-            yield f"\n[{tool_name}…]"
+            yield f"\n[{tool_name}â€¦]"
             tool_args = json.loads(tool_call.function.arguments)
             tool_result = run_tool(tool_name, tool_args)
 
@@ -178,7 +178,7 @@ async def stream_llm_response(user_message: str, history: list, persona: Optiona
             })
 
         stream = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=messages,
             max_tokens=500,
             temperature=0.7,
@@ -189,9 +189,9 @@ async def stream_llm_response(user_message: str, history: list, persona: Optiona
             if delta:
                 yield delta
     else:
-        # No tool needed — re-issue as a streamed call for token-by-token output
+        # No tool needed â€” re-issue as a streamed call for token-by-token output
         stream = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=messages,
             tools=TOOLS,
             tool_choice="none",
