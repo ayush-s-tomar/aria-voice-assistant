@@ -4,7 +4,7 @@ ARIA - Voice AI Assistant (Streamlit edition)
 Single-file deployment target: Streamlit Community Cloud (free).
 No FastAPI, no WebSocket server, no Render. Everything runs in one process.
 
-Pipeline: mic recording -> Groq Whisper STT -> LLaMA 3.3-70B (+ tools) -> gTTS/ElevenLabs -> spoken reply
+Pipeline: mic recording -> Groq Whisper STT -> GPT-OSS 120B (+ tools) -> gTTS/ElevenLabs -> spoken reply
 Memory: Upstash Redis (same DB as before) if configured, else in-session only.
 """
 
@@ -216,7 +216,7 @@ st.markdown(
 )
 
 for msg in st.session_state.messages:
-    
+
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
         if msg["role"] == "assistant" and msg.get("audio"):
@@ -312,3 +312,4 @@ if user_text:
                 "content": assistant_text,
                 "audio": audio_bytes,
             })
+            st.rerun()
