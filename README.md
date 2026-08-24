@@ -1,32 +1,25 @@
 # 🎙️ ARIA — Voice AI Assistant
 
-**Speech-to-Speech AI assistant** built with Groq Whisper + LLaMA 3.3-70B + gTTS/ElevenLabs
+**Speech-to-Speech AI assistant** built with Groq Whisper + GPT-OSS 120B + gTTS/ElevenLabs
 
-**Pipeline:** Your voice → Groq Whisper STT → LLaMA 3.3-70B (Groq) → gTTS/ElevenLabs TTS → Voice response
+**Pipeline:** Your voice → Groq Whisper STT → GPT-OSS 120B (Groq) → gTTS/ElevenLabs TTS → Voice response
 
 [![CI](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/ci.yml)
-[![Deploy](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/ayush-s-tomar/aria-voice-assistant/actions/workflows/pages/pages-build-deployment)
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Groq](https://img.shields.io/badge/LLM-Groq%20LLaMA%203.3--70B-orange)](https://groq.com/)
+[![Streamlit](https://img.shields.io/badge/Deploy-Streamlit%20Cloud-FF4B4B?logo=streamlit&logoColor=white)](https://aria-bot.streamlit.app/)
+[![Groq](https://img.shields.io/badge/LLM-Groq%20GPT--OSS%20120B-orange)](https://groq.com/)
 [![Upstash](https://img.shields.io/badge/Memory-Upstash%20Redis-00E9A3)](https://upstash.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/ayush-s-tomar/aria-voice-assistant?style=social)](https://github.com/ayush-s-tomar/aria-voice-assistant/stargazers)
 [![Last Commit](https://img.shields.io/github/last-commit/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant/commits/main)
-[![Repo Size](https://img.shields.io/github/repo-size/ayush-s-tomar/aria-voice-assistant)](https://github.com/ayush-s-tomar/aria-voice-assistant)
 
-🌐 **Try it live (Streamlit):** [aria-assistant.streamlit.app](https://aria-assistant.streamlit.app/)
-🌐 **Live Demo (GitHub Pages):** [ayush-s-tomar.github.io/aria-voice-assistant](https://ayush-s-tomar.github.io/aria-voice-assistant)
-⚙️ **Backend API:** [aria-voice-assistant-6eze.onrender.com](https://aria-voice-assistant-6eze.onrender.com)
-📖 **API Docs:** [aria-voice-assistant-6eze.onrender.com/docs](https://aria-voice-assistant-6eze.onrender.com/docs)
+🌐 **Try it live:** [aria-bot.streamlit.app](https://aria-bot.streamlit.app/)
 
-> Note: the Render backend is on the free tier, so the first request after idle may take 30–60s to wake up.
+> The live demo runs on the Streamlit Community Cloud build (`streamlit-app/`), which is fully self-contained — no separate backend required. The FastAPI backend (`backend/`) and WebSocket frontend (`frontend/`) are included in this repo for self-hosting (see [Deploy your own](#-deploy-your-own)) but are not currently hosted publicly.
 
 ---
 
 ## 🎬 Demo
-
-![ARIA demo highlight](assets/ARIA.gif)
 
 ![ARIA demo screenshot](assets/ARIA-Bot-Demo.png)
 
@@ -38,17 +31,16 @@
 
 ## ✨ Features
 
-- 🎤 **Voice input** — record directly from your browser mic with real-time waveform
+- 🎤 **Voice input** — record directly from your browser mic
 - 🌍 **99-language support** — speak in Hindi, Spanish, French, English, and more — auto-detected and passed through to TTS
-- 🧠 **Persistent memory** — session history stored in Upstash Redis; survives server restarts and redeploys
+- 🧠 **Persistent memory** — session history stored in Upstash Redis; survives restarts and redeploys
 - 🔊 **Voice output** — responses spoken aloud via gTTS (free) or ElevenLabs multilingual v2 (premium)
-- ⚡ **WebSocket streaming** — tokens stream in real time; audio plays sentence-by-sentence as ARIA responds
 - 🛠️ **6 built-in tools** — web search (Tavily), calculator, live weather, Wikipedia summaries, current date/time, and unit converter — ARIA picks the right one automatically
-- 🔐 **GitHub OAuth** — sign in to persist your session across devices with JWT auth
 - 🎭 **Persona customization** — tell ARIA how to speak per session (concise, formal, tutor, Hindi, etc.)
-- 🎨 **Dark / light theme** — one click, persisted in localStorage
-- 💬 **Text fallback** — type messages if mic isn't available; mic permission errors give step-by-step fix instructions
+- 💬 **Text fallback** — type messages if mic isn't available
 - ⚡ **TTS caching** — identical phrases skip regeneration, cutting latency and API calls
+
+*(The FastAPI backend additionally supports GitHub OAuth, WebSocket token streaming, and dark/light theme toggling — see [Project Structure](#️-project-structure) below.)*
 
 ---
 
@@ -56,24 +48,23 @@
 
 ```
 aria-voice-assistant/
-├── backend/
-│   ├── main.py                  # FastAPI app — HTTP + WebSocket endpoints, auth middleware
-│   ├── requirements.txt
-│   ├── .env.example
+├── streamlit-app/                # Live deployment target — Streamlit Community Cloud
+│   ├── streamlit_app.py          # Single-file voice UI: mic input, chat, sidebar, persona
 │   └── services/
-│       ├── transcriber.py       # Groq Whisper large-v3 STT (99 languages)
-│       ├── llm.py               # Groq LLaMA 3.3-70B — streaming, tool use, persona
-│       ├── tts.py               # gTTS / ElevenLabs — language passthrough, in-memory cache
-│       ├── memory.py            # Upstash Redis — persistent rolling history + persona store
-│       ├── tools.py             # 6 tools: web search, calculator, weather, Wikipedia, datetime, unit converter
-│       └── auth.py              # GitHub OAuth + JWT creation / verification
+│       ├── transcriber.py        # Groq Whisper large-v3 STT (99 languages)
+│       ├── llm.py                # Groq GPT-OSS 120B — tool use, persona
+│       ├── tts.py                # gTTS / ElevenLabs — language passthrough, caching
+│       └── memory.py             # Upstash Redis — persistent rolling history + persona store
+├── backend/                      # FastAPI backend (self-host only, not publicly deployed)
+│   ├── main.py                   # HTTP + WebSocket endpoints, auth middleware
+│   └── services/                 # Same services as above, plus auth.py (GitHub OAuth + JWT)
 ├── frontend/
-│   └── index.html               # Single-file voice UI — WebSocket, streaming, theme toggle
-├── assets/                      # Demo GIF and other README media
-├── docs/                        # GitHub Pages deployment (copy of frontend) + demo assets
-├── .github/workflows/ci.yml     # CI — lint + import check on every push/PR
-├── render.yaml                  # One-click Render deploy config
-├── LICENSE                      # MIT
+│   └── index.html                # Single-file WebSocket voice UI (pairs with backend/)
+├── assets/                       # Demo screenshot and other README media
+├── docs/                         # GitHub Pages deployment (copy of frontend) + demo assets
+├── .github/workflows/ci.yml      # CI — lint + import check on every push/PR
+├── render.yaml                   # Render deploy config (for self-hosting the backend)
+├── LICENSE                       # MIT
 └── README.md
 ```
 
@@ -84,18 +75,17 @@ aria-voice-assistant/
 | Layer     | Tech                                                              |
 | --------- | ------------------------------------------------------------------ |
 | STT       | Groq Whisper large-v3 (cloud, free, 99 languages)                  |
-| LLM       | Groq · LLaMA 3.3-70B (streaming + tool use)                        |
+| LLM       | Groq · GPT-OSS 120B (tool use)                                     |
 | TTS       | gTTS (free) / ElevenLabs multilingual v2 (premium)                 |
 | Memory    | Upstash Redis (persistent, survives redeploys)                     |
 | Tools     | Tavily web search · calculator · wttr.in weather · Wikipedia REST · datetime · unit converter |
-| Auth      | GitHub OAuth · JWT sessions                                        |
-| API       | FastAPI · Uvicorn · WebSockets                                     |
-| Frontend  | Vanilla HTML/CSS/JS (no framework)                                 |
-| CI/CD     | GitHub Actions (lint + import check) · Render (backend) · GitHub Pages (frontend) |
+| API (self-host) | FastAPI · Uvicorn · WebSockets · GitHub OAuth · JWT sessions |
+| Frontend  | Streamlit (live) / Vanilla HTML/CSS/JS (self-host WebSocket variant) |
+| CI/CD     | GitHub Actions (lint + import check) · Streamlit Community Cloud |
 
 ---
 
-## ⚙️ Local Setup
+## ⚙️ Local Setup (Streamlit — matches the live demo)
 
 ### Prerequisites
 - Python 3.11
@@ -105,62 +95,32 @@ aria-voice-assistant/
 ### Step 1 — Clone & setup
 ```bash
 git clone https://github.com/ayush-s-tomar/aria-voice-assistant.git
-cd aria-voice-assistant/backend
+cd aria-voice-assistant/streamlit-app
 
 py -3.11 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Step 2 — Configure environment
-```bash
-copy .env.example .env
-```
-Edit `.env`:
-```env
-# Required
-GROQ_API_KEY=your_groq_api_key_here
-
-# Upstash Redis (required for persistent memory)
-UPSTASH_REDIS_REST_URL=https://your-db.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your_upstash_token_here
-
-# GitHub OAuth (optional — enables login)
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-JWT_SECRET=any_random_string_here
-FRONTEND_URL=http://localhost:8000
-
-# Optional upgrades
-ELEVENLABS_API_KEY=        # leave blank to use free gTTS
-ELEVENLABS_VOICE_ID=       # defaults to Rachel
-ARIA_NAME=ARIA             # rename the assistant
-ARIA_PERSONA_EXTRA=        # append extra instructions to system prompt
-SESSION_TTL_HOURS=24       # how long sessions persist in Redis
+### Step 2 — Configure secrets
+Create `.streamlit/secrets.toml` inside `streamlit-app/`:
+```toml
+GROQ_API_KEY = "your_groq_api_key_here"
+UPSTASH_REDIS_REST_URL = "https://your-db.upstash.io"
+UPSTASH_REDIS_REST_TOKEN = "your_upstash_token_here"
+TAVILY_API_KEY = "your_tavily_key_here"
+ELEVENLABS_API_KEY = ""        # leave blank to use free gTTS
+ELEVENLABS_VOICE_ID = ""       # defaults to Rachel
+ARIA_NAME = "ARIA"             # rename the assistant
+ARIA_PERSONA_EXTRA = ""        # append extra instructions to system prompt
+SESSION_TTL_HOURS = "24"       # how long sessions persist in Redis
 ```
 
 ### Step 3 — Run
 ```bash
-uvicorn main:app --reload --port 8000
+streamlit run streamlit_app.py
 ```
-Then open `frontend/index.html` in Chrome.
-
----
-
-## 🌐 API Endpoints
-
-| Method | Endpoint                  | Description                                          |
-| ------ | -------------------------- | ------------------------------------------------------ |
-| GET    | `/`                         | Health check                                            |
-| GET    | `/auth/login`               | Redirect to GitHub OAuth                                 |
-| GET    | `/auth/callback`            | OAuth callback — returns JWT                              |
-| GET    | `/auth/me`                  | Current user info from JWT                               |
-| WS     | `/ws/{session_id}`          | Full streaming pipeline: audio → STT → LLM → TTS chunks   |
-| POST   | `/chat/voice`                | HTTP fallback: audio → STT → LLM → TTS → audio            |
-| POST   | `/chat/text`                 | Text-only: message → LLM response                       |
-| GET    | `/session/{id}`              | Session metadata (message count, persona, TTL)          |
-| PUT    | `/session/{id}/persona`      | Set persona override for this session                    |
-| DELETE | `/session/{id}`              | Clear session history and persona                        |
+Opens at `http://localhost:8501`.
 
 ---
 
@@ -170,35 +130,22 @@ Then open `frontend/index.html` in Chrome.
 - Go to [upstash.com](https://upstash.com) → Create database → choose a region
 - Copy REST URL and REST Token from the database dashboard
 
-### 2 — GitHub OAuth (optional login)
-- Go to GitHub → Settings → Developer Settings → OAuth Apps → New OAuth App
-- Set Homepage URL to your Render URL
-- Set Callback URL to `https://your-render-url.onrender.com/auth/callback`
-- Copy Client ID and Client Secret
-
-### 3 — Backend → Render
-- Fork this repo
-- Go to [render.com](https://render.com) → New → Web Service
-- Connect your fork — `render.yaml` is auto-detected
-- Add env vars in Render dashboard (see `.env.example`)
-- Deploy
-
-### 4 — Frontend → GitHub Pages
-- Update `const API` and `const WS_API` in `frontend/index.html` with your Render URL
-- Copy to `docs/index.html` and push
-- Enable GitHub Pages → branch: `main` → folder: `/docs`
-
-### 5 — Frontend → Streamlit Community Cloud (alternative)
-- Streamlit Cloud → New app → connect this repo
-- Point to your Streamlit entry file
-- Add secrets (`GROQ_API_KEY`, Upstash credentials, etc.) in the app's Secrets manager
+### 2 — Streamlit Community Cloud (recommended — matches the live demo)
+- [share.streamlit.io](https://share.streamlit.io) → New app → connect your fork
+- Main file path: `streamlit-app/streamlit_app.py`
+- Add the same keys shown in Step 2 above under **Settings → Secrets** (TOML format)
 - Deploy — live at your `*.streamlit.app` URL
+
+### 3 — FastAPI backend (optional, self-host only)
+- Go to [render.com](https://render.com) → New → Web Service → connect your fork
+- `render.yaml` is auto-detected; add the same env vars from `.env.example` in `backend/`
+- Pairs with `frontend/index.html` (update `const API` / `const WS_API` with your Render URL) or GitHub Pages via `docs/`
 
 ---
 
 ## 🧠 How memory works
 
-Each browser tab generates a unique `session_id`. History is stored in Upstash Redis as a rolling 20-message window — it persists across server restarts, Render redeploys, and browser refreshes. Authenticated users get namespaced sessions (`user:{github_id}:session:{id}`) so their history is private. Sessions expire after 24 hours by default (configurable via `SESSION_TTL_HOURS`).
+Each browser tab generates a unique `session_id`. History is stored in Upstash Redis as a rolling 20-message window — it persists across restarts and redeploys. Sessions expire after 24 hours by default (configurable via `SESSION_TTL_HOURS`).
 
 ---
 
@@ -219,29 +166,25 @@ ARIA automatically selects the right tool based on your message — no commands 
 
 ## 🎭 Persona customization
 
-Hit **Customize ARIA** in the sidebar to give ARIA a per-session tone. Choose a preset (Concise, Casual, Formal, Tutor, Witty, Hindi) or write your own instruction. This calls `PUT /session/{id}/persona` and is stored alongside the session history in Redis. Reset to default any time.
+Choose a preset (Concise, Casual, Formal, Tutor, Witty, Hindi) or write your own instruction in the sidebar. Persona is stored alongside session history in Redis and applies to every reply until reset.
 
 ---
 
 ## 🔊 Upgrade to premium voice (ElevenLabs)
 
-1. Get API key at [elevenlabs.io](https://elevenlabs.io)
-2. Add to `.env`:
-   ```env
-   ELEVENLABS_API_KEY=your_key_here
-   ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM  # Rachel (default)
+1. Get an API key at [elevenlabs.io](https://elevenlabs.io)
+2. Add to your secrets:
+   ```toml
+   ELEVENLABS_API_KEY = "your_key_here"
+   ELEVENLABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel (default)
    ```
-3. Restart backend — switches automatically to ElevenLabs multilingual v2, no code changes needed
+3. Select "ElevenLabs" in the sidebar's Voice engine option — no code changes needed
 
 ---
 
 ## ✅ CI/CD
 
-Every push and PR to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
-- **Backend** — installs dependencies, lints with `ruff`, verifies `main.py` imports cleanly, runs the pytest suite
-- **Frontend** — checks `frontend/index.html` and `docs/index.html` are present and non-empty
-
-Deployment is separate from CI: the backend auto-deploys to Render on push to `main` (via Render's GitHub integration), and the frontend auto-deploys to GitHub Pages from `/docs`.
+Every push and PR to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml), which installs dependencies, lints with `ruff`, and verifies the app imports cleanly. Streamlit Community Cloud auto-redeploys on every push to `main`.
 
 ---
 
@@ -254,4 +197,4 @@ MIT — see [LICENSE](LICENSE) for details.
 ## 🛠️ Built by
 
 **Ayush Singh Tomar** — AI Developer
-[LinkedIn](https://linkedin.com/in/ayush-s-tomar) · [GitHub](https://github.com/ayush-s-tomar) · [Portfolio](https://ayush-s-tomar.github.io)
+[LinkedIn](https://linkedin.com/in/ayush-s-tomar) · [GitHub](https://github.com/ayush-s-tomar) · [Portfolio](https://ayush-s-tomar.vercel.app)
